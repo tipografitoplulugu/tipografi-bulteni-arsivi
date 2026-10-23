@@ -4,7 +4,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
 
-[Türkçe Tipografi Topluluğu](https://medium.com/tipografi) tarafından 2019 yılından bu yana düzenli olarak hazırlanan aylık bültenlerin tam metin aranabilir dijital arşivi ve bilgi tabanı.
+[Türkçe Tipografi Topluluğu](https://tipografi.substack.com) tarafından 2019 yılından bu yana düzenli olarak yayımlanan aylık bültenlerin tam metin aranabilir dijital arşivi ve bilgi tabanı.
 
 👉 **Canlı Arama Motoru:** [tipografi-bulteni-arsivi.streamlit.app](https://tipografi-bulteni-arsivi.streamlit.app/)
 
