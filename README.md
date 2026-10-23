@@ -10,21 +10,15 @@
 
 ---
 
-## 📌 Proje Hakkında
+## Proje Hakkında
 
 Bu proje; tipografi, yazı tasarımı, görsel kimlik, açık kaynaklı fontlar, lisanslama tartışmaları, kaligrafi ve baskı tarihi üzerine dünyadan ve Türkiye’den derlenen aylık gelişmelerin toplandığı kapsamlı bir arama platformudur.
 
-Arşivde yer alan **93 bülten**, bağımsız haber bloklarına ayrılarak tam metin arama (Full-Text Search) motoruyla indekslenmiştir.
-
-### 📊 Arşiv İstatistikleri
-* **Kapsanan Dönem:** 2019 – 2026
-* **Toplam Bülten:** 93 Sayı
-* **İndekslenen Haber / Gelişme:** 1.620+ kayıt
-* **Veritabanı Motoru:** SQLite (FTS5)
+Arşivde yer alan bültenler, bağımsız haber bloklarına ayrılarak tam metin arama (Full-Text Search) motoruyla indekslenmiştir.
 
 ---
 
-## ✨ Özellikler
+## Özellikler
 
 * **Hızlı Tam Metin Arama (FTS5):** Aradığınız terimi (*örn: değişken yazıtipi, Monotype, Gutenberg, kaligrafi, yapay zekâ*) başlık ve paragraflar içinde milisaniyeler içinde bulur.
 * **Akıllı Sonuç Kartları:** Aranan anahtar kelimenin hangi aylarda ve hangi bültenlerde yer aldığını özet kaynak bilgisiyle gösterir.
@@ -33,11 +27,9 @@ Arşivde yer alan **93 bülten**, bağımsız haber bloklarına ayrılarak tam m
 
 ---
 
-## 🚀 Yerel Kurulum (Local Setup)
+## Topluluk & Bağlantılar
 
-Projeyi kendi bilgisayarınızda çalıştırmak için:
-
-1. **Depoyu klonlayın:**
-   ```bash
-   git clone https://github.com/tipografitoplulugu/tipografi-bulteni-arsivi.git
-   cd tipografi-bulteni-arsivi
+Tipografi Bülteni: tipografi.substack.com
+X: @tipografi
+Instagram: @tipografitoplulugu
+YouTube: @tipografi
