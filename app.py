@@ -11,36 +11,130 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Tipografik Stil: Başlıklar Alegreya, Metinler SF Pro
+# Tipografik Stil ve Arayüz İyileştirmeleri
 st.markdown("""
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Alegreya:ital,wght@0,400..900;1,400..900&display=swap" rel="stylesheet">
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Alegreya:ital,wght@0,400..900;1,400..900&display=swap');
-
-/* Başlıklar: Substack tarzı Alegreya */
-h1, h2, h3, h4, h5, h6, .stTitle, [data-testid="stHeadingWithActionElements"] {
+/* 1. Başlıklar: Substack editoryal tarzı Alegreya Serif */
+h1, h2, h3, h4, h5, h6,
+h1 *, h2 *, h3 *, h4 *, h5 *, h6 *,
+.stTitle, .stTitle *,
+.stHeader, .stHeader *,
+.stSubheader, .stSubheader *,
+[data-testid="stHeadingWithActionElements"],
+[data-testid="stHeadingWithActionElements"] *,
+[data-testid="stMarkdownContainer"] h1,
+[data-testid="stMarkdownContainer"] h1 *,
+[data-testid="stMarkdownContainer"] h2,
+[data-testid="stMarkdownContainer"] h2 *,
+[data-testid="stMarkdownContainer"] h3,
+[data-testid="stMarkdownContainer"] h3 * {
     font-family: 'Alegreya', Georgia, serif !important;
     font-weight: 700 !important;
     letter-spacing: -0.015em !important;
 }
 
-/* Gövde Metinleri ve Arayüz: Apple SF Pro */
-html, body, [class*="css"], .stMarkdown, p, span, div, input, button, select, [data-testid="stMetricValue"] {
+/* 2. Gövde Metinleri ve Arayüz: Apple SF Pro */
+html, body, .stApp, [data-testid="stAppViewContainer"] {
     font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
 }
 
-/* Fosforlu Arama Vurgusu (Highlight) */
+p, li, .stMarkdown p, [data-testid="stMarkdownContainer"] p, [data-testid="stMarkdownContainer"] li {
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
+    font-size: 1.02rem !important;
+    line-height: 1.65 !important;
+}
+
+/* 3. Streamlit İkonlarını Koru (Font çakışmasını ve '_arr...' bozulmalarını önler) */
+[data-testid="stIconMaterial"], 
+[data-testid="stExpanderToggleIcon"],
+[data-testid="stExpanderToggleIcon"] *,
+.material-symbols-rounded, 
+.material-icons,
+[class*="StyledIcon"],
+[class*="Icon"] {
+    font-family: 'Material Symbols Rounded', 'Material Icons', sans-serif !important;
+}
+
+/* 4. Bağlantı Linkleri: Mavi ve Altı Çizgili */
+a, [data-testid="stMarkdownContainer"] a, .stMarkdown a {
+    color: #38bdf8 !important;
+    text-decoration: underline !important;
+    text-underline-offset: 3px !important;
+    text-decoration-thickness: 1.2px !important;
+    font-weight: 500 !important;
+    background: transparent !important;
+    transition: color 0.15s ease;
+}
+a:hover, [data-testid="stMarkdownContainer"] a:hover, .stMarkdown a:hover {
+    color: #7dd3fc !important;
+}
+
+/* 5. Zarif Arama Vurgusu (Sarı Blok Yerine İnce Altın Kehribar Vurgu) */
 mark {
-    background-color: #fef08a !important;
-    color: #111827 !important;
-    padding: 0.12em 0.3em !important;
-    border-radius: 0.25em !important;
+    background-color: rgba(245, 158, 11, 0.22) !important;
+    color: inherit !important;
+    border-bottom: 2px solid rgba(245, 158, 11, 0.85) !important;
+    padding: 0.05em 0.25em !important;
+    border-radius: 3px !important;
     font-weight: 600 !important;
 }
 
-/* Kart ayracı */
+/* 6. Popüler Konu Butonları (Arama Alanının Altında Düşük Opaklıklı Haplar) */
+.tag-section-title {
+    font-size: 0.82rem !important;
+    opacity: 0.65 !important;
+    margin-top: 0.2rem !important;
+    margin-bottom: 0.35rem !important;
+    font-weight: 500 !important;
+}
+
+div[data-testid="stHorizontalBlock"] button {
+    opacity: 0.65 !important;
+    font-size: 0.78rem !important;
+    padding: 0.2rem 0.5rem !important;
+    min-height: 28px !important;
+    height: 28px !important;
+    border-radius: 14px !important;
+    border: 1px solid rgba(255, 255, 255, 0.18) !important;
+    background: rgba(255, 255, 255, 0.04) !important;
+    transition: all 0.2s ease !important;
+}
+
+div[data-testid="stHorizontalBlock"] button:hover {
+    opacity: 1 !important;
+    border-color: #38bdf8 !important;
+    background: rgba(56, 189, 248, 0.12) !important;
+}
+
+/* 7. Açılır Kutular (Expander / Alıntı Formatı) */
+[data-testid="stExpander"] {
+    border: 1px solid rgba(255, 255, 255, 0.12) !important;
+    border-radius: 8px !important;
+    background: rgba(255, 255, 255, 0.02) !important;
+    margin-top: 0.5rem !important;
+    margin-bottom: 0.5rem !important;
+}
+
+[data-testid="stExpander"] summary {
+    font-size: 0.88rem !important;
+    opacity: 0.85 !important;
+    padding-top: 0.35rem !important;
+    padding-bottom: 0.35rem !important;
+}
+
+[data-testid="stExpander"] summary:hover {
+    opacity: 1 !important;
+    color: #38bdf8 !important;
+}
+
+/* Kart Ayracı */
 hr {
     margin-top: 1.5rem !important;
     margin-bottom: 1.5rem !important;
+    border-color: rgba(255, 255, 255, 0.1) !important;
 }
 </style>
 """, unsafe_allow_html=True)
@@ -199,21 +293,14 @@ with st.sidebar:
     st.markdown("Türkçe Tipografi Topluluğu bülten arşivinde başlık ve içerik araması yapabilirsiniz.")
     st.markdown("🌐 [Substack](https://tipografi.substack.com/) | [Medium](https://medium.com/tipografi)")
 
-# Ana Sayfa
+# Ana Sayfa Başlığı
 st.title("🔍 Tipografi Bülteni Gelişmeler Veritabanı")
 st.markdown("Arşivde yer alan **90+ bülten** içindeki tüm gelişmeleri, terimleri ve haberleri arayın.")
 
-# Popüler Konu Etiketleri
 if "secili_etiket" not in st.session_state:
     st.session_state["secili_etiket"] = ""
 
-st.write("**Popüler Konular:**")
-cols = st.columns(len(POPULER_ETIKETLER))
-for i, tag in enumerate(POPULER_ETIKETLER):
-    if cols[i].button(tag, key=f"btn_{i}", use_container_width=True):
-        st.session_state["secili_etiket"] = tag
-
-# Arama Alanı
+# 1. Arama Alanı ve Yıl Filtresi
 col_search, col_filter = st.columns([4, 1])
 with col_search:
     sorgu_input = st.text_input(
@@ -228,6 +315,14 @@ with col_filter:
         ["Tümü", "2026", "2025", "2024", "2023", "2022", "2021", "2020", "2019"],
         label_visibility="collapsed"
     )
+
+# 2. Arama Alanının Altında Zarif, Düşük Opaklıklı Popüler Konu Butonları
+st.markdown('<div class="tag-section-title">Popüler Konular:</div>', unsafe_allow_html=True)
+tag_cols = st.columns(len(POPULER_ETIKETLER))
+for i, tag in enumerate(POPULER_ETIKETLER):
+    if tag_cols[i].button(tag, key=f"btn_tag_{i}", use_container_width=True):
+        st.session_state["secili_etiket"] = tag
+        st.rerun()
 
 kelime = sorgu_input.strip()
 
@@ -272,7 +367,7 @@ if kelime:
         kaynak_str = " • ".join(kaynak_linkleri)
         st.info(f"**Anahtar Kelime:** `{kelime}`\n\n**Kaynak Bültenler:** {kaynak_str}\n\n**Bulunan Sonuç:** {len(sonuclar)} gelişme")
 
-        # Zaman Çizelgesi Grafiği
+        # Zaman Çizelgesi Dağılım Grafiği
         df_trend = pd.DataFrame(
             [{"Yıl": str(y), "Gelişme Sayısı": count} for y, count in yil_dagilimi.items()]
         ).set_index("Yıl")
@@ -289,7 +384,7 @@ if kelime:
             temiz_icerik = gorsel_satirlarini_temizle(icerik)
             
             with st.container():
-                # Başlığı vurgula
+                # Başlığı Alegreya serif ile göster ve aranan kelimeyi zarifçe vurgula
                 vurgulu_baslik = highlight_keyword(baslik, kelime)
                 st.markdown(f"### {vurgulu_baslik}", unsafe_allow_html=True)
                 
@@ -316,17 +411,13 @@ if kelime:
                     vurgulu_icerik = highlight_keyword(temiz_icerik, kelime)
                     st.markdown(vurgulu_icerik, unsafe_allow_html=True)
                 
-                # Alıntıla (Cite) Butonu
+                # Alıntıla (Cite) Kutusu
                 temiz_baslik_duz = re.sub(r"[*_`#]", "", baslik).strip()
                 alinti_metni = f'Türkçe Tipografi Topluluğu. ({yil}, {ay}). "{temiz_baslik_duz}". Tipografi Bülteni. Erişim: {bulten_url}'
                 
-                if hasattr(st, "popover"):
-                    with st.popover("📖 Alıntıla (Cite)"):
-                        st.code(alinti_metni, language="text")
-                        st.caption("APA / Editoryal alıntı formatı. Sağ üstteki simgeden tek tıkla kopyalayabilirsiniz.")
-                else:
-                    with st.expander("📖 Alıntı Formatı (Cite)"):
-                        st.code(alinti_metni, language="text")
+                with st.expander("📖 Alıntıla (APA / Editoryal Format)", expanded=False):
+                    st.code(alinti_metni, language="text")
+                    st.caption("APA / Editoryal alıntı formatı. Sağ üstteki simgeden tek tıkla kopyalayabilirsiniz.")
                         
                 st.divider()
     else:
