@@ -13,10 +13,8 @@ st.set_page_config(
 
 # Tipografik Stil ve Arayüz İyileştirmeleri
 st.markdown("""
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Alegreya:ital,wght@0,400..900;1,400..900&display=swap" rel="stylesheet">
 <style>
+@import url('https://fonts.googleapis.com/css2?family=Alegreya:ital,wght@0,400..900;1,400..900&display=swap');
 /* 1. Başlıklar: Substack editoryal tarzı Alegreya Serif */
 h1, h2, h3, h4, h5, h6,
 h1 *, h2 *, h3 *, h4 *, h5 *, h6 *,
@@ -257,7 +255,7 @@ def highlight_keyword(text, keyword):
         return text
     def repl(m):
         full = m.group(0)
-        if full.startswith("[") and "](<" in full and full.endswith(">)"):
+        if full.startswith("[") and "](" in full and full.endswith(")"):
             anchor, url = full[1:-1].split("](", 1)
             highlighted_anchor = re.sub(re.escape(keyword), r"<mark>\g<0></mark>", anchor, flags=re.IGNORECASE)
             return f"[{highlighted_anchor}]({url})"
