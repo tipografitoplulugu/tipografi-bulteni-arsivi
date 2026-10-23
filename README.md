@@ -30,7 +30,11 @@ Arşivde yer alan bültenler, bağımsız haber bloklarına ayrılarak tam metin
 ## Topluluk & Bağlantılar
 
 E-posta: tipografitoplulugu@gmail.com
+
 Tipografi Bülteni: [tipografi.substack.com](https://tipografi.substack.com/)
+
 X: [@tipografi](https://x.com/tipografi)
+
 Instagram: [@tipografitoplulugu](https://www.instagram.com/tipografitoplulugu)
+
 YouTube: [@tipografi](https://www.youtube.com/@tipografi)
