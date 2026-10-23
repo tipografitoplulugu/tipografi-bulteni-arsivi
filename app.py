@@ -5,7 +5,7 @@ import os
 import pandas as pd
 
 st.set_page_config(
-    page_title="Tipografi Bülteni Veritabanı",
+    page_title="Tipografi Bülteni Arama Motoru",
     page_icon="T",
     layout="wide",
     initial_sidebar_state="expanded"
@@ -296,17 +296,17 @@ total_bulten, total_haber = cur.fetchone()
 # Kenar Çubuğu
 with st.sidebar:
     st.image("logo.png", width=120)
-    st.title("Türkçe Tipografi Topluluğu")
-    st.markdown("**Arşiv Kapsamı:** 2019–2026")
+    st.title("Tipografi Bülteni")
+    st.markdown("**Arşiv Kapsamı:** 2019 – 2026")
     st.markdown(f"**Toplam Bülten:** {total_bulten} Sayı")
     st.markdown(f"**İndekslenen Gelişme:** {total_haber:,}")
     st.divider()
-    st.markdown("Türkçe Tipografi Topluluğu'nun 2019'dan bu yana aylık olarak yayımladığı bültenlerde yer alan gelişmeler arasında içerik araması yapabilirsin.")
-    st.markdown("[Substack](https://tipografi.substack.com/) | [Medium](https://medium.com/tipografi)")
+    st.markdown("Türkçe Tipografi Topluluğu bülten arşivinde başlık ve içerik araması yapabilirsiniz.")
+    st.markdown("🌐 [Substack](https://tipografi.substack.com/) | [Medium](https://medium.com/tipografi)")
 
 # Ana Sayfa Başlığı
-st.title("🔍 Tipografi Bülteni Veritabanı")
-st.markdown("Arşivde yer alan **90+ bülten** içindeki tüm gelişmeleri, terimleri ve haberleri arayabilirsin.")
+st.title("🔍 Tipografi Bülteni Gelişmeler Veritabanı")
+st.markdown("Arşivde yer alan **90+ bülten** içindeki tüm gelişmeleri, terimleri ve haberleri arayın.")
 
 if "secili_etiket" not in st.session_state:
     st.session_state["secili_etiket"] = ""
@@ -422,13 +422,14 @@ if kelime:
                     vurgulu_icerik = highlight_keyword(temiz_icerik, kelime)
                     st.markdown(vurgulu_icerik, unsafe_allow_html=True)
                 
-                # Alıntıla (Cite) Kutusu
+                # Alıntıla (Cite) Kutusu — APA 7
                 temiz_baslik_duz = re.sub(r"[*_`#]", "", baslik).strip()
-                alinti_metni = f'Türkçe Tipografi Topluluğu. ({yil}, {ay}). "{temiz_baslik_duz}". Tipografi Bülteni. Erişim: {bulten_url}'
+                # APA 7: Yazar. (Yıl, Ay). Başlık. *Süreli Yayın Adı*. URL
+                alinti_metni = f'Türkçe Tipografi Topluluğu. ({yil}, {ay}). {temiz_baslik_duz}. Tipografi Bülteni. {bulten_url}'
                 
-                with st.expander("📖 Alıntıla (APA)", expanded=False):
+                with st.expander("📖 Alıntıla (APA 7)", expanded=False):
                     st.code(alinti_metni, language="text")
-                    st.caption("APA alıntı formatı. Sağ üstteki simgeden tek tıkla kopyalayabilirsiniz.")
+                    st.caption("APA 7 alıntı formatı. Kullanırken *Tipografi Bülteni* italik yazılmalıdır. Sağ üstteki simgeden tek tıkla kopyalayabilirsiniz.")
                         
                 st.divider()
     else:
