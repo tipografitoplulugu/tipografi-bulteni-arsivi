@@ -134,6 +134,13 @@ hr {
     margin-bottom: 1.5rem !important;
     border-color: rgba(255, 255, 255, 0.1) !important;
 }
+
+/* 8. Zemin Rengi */
+html, body, .stApp, [data-testid="stAppViewContainer"], [data-testid="stHeader"],
+[data-testid="stSidebar"], [data-testid="stSidebar"] > div,
+[data-testid="stSidebarContent"], section[data-testid="stSidebar"] {
+    background-color: #121212 !important;
+}
 </style>
 """, unsafe_allow_html=True)
 
@@ -284,10 +291,10 @@ total_bulten, total_haber = cur.fetchone()
 # Kenar Çubuğu
 with st.sidebar:
     st.image("logo.png", width=120)
-    st.title("Tipografi Bülteni Arşivi")
-    st.markdown("2019 – 2026")
-    st.metric("Toplam Bülten", f"{total_bulten} Sayı")
-    st.metric("İndekslenen Gelişme", f"{total_haber:,}")
+    st.title("Tipografi Bülteni")
+    st.markdown("**Arşiv Kapsamı:** 2019 – 2026")
+    st.markdown(f"**Toplam Bülten:** {total_bulten} Sayı")
+    st.markdown(f"**İndekslenen Gelişme:** {total_haber:,}")
     st.divider()
     st.markdown("Türkçe Tipografi Topluluğu bülten arşivinde başlık ve içerik araması yapabilirsiniz.")
     st.markdown("🌐 [Substack](https://tipografi.substack.com/) | [Medium](https://medium.com/tipografi)")
