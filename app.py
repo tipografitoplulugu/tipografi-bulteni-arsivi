@@ -426,9 +426,9 @@ if kelime:
                 temiz_baslik_duz = re.sub(r"[*_`#]", "", baslik).strip()
                 alinti_metni = f'Türkçe Tipografi Topluluğu. ({yil}, {ay}). "{temiz_baslik_duz}". Tipografi Bülteni. Erişim: {bulten_url}'
                 
-                with st.expander("📖 Alıntıla (APA / Editoryal Format)", expanded=False):
+                with st.expander("📖 Alıntıla (APA)", expanded=False):
                     st.code(alinti_metni, language="text")
-                    st.caption("APA / Editoryal alıntı formatı. Sağ üstteki simgeden tek tıkla kopyalayabilirsiniz.")
+                    st.caption("APA alıntı formatı. Sağ üstteki simgeden tek tıkla kopyalayabilirsiniz.")
                         
                 st.divider()
     else:
