@@ -297,7 +297,7 @@ total_bulten, total_haber = cur.fetchone()
 with st.sidebar:
     st.image("logo.png", width=120)
     st.title("Türkçe Tipografi Topluluğu")
-    st.markdown("**Arşiv Kapsamı:** 2019 – 2026")
+    st.markdown("**Arşiv Kapsamı:** 2019–2026")
     st.markdown(f"**Toplam Bülten:** {total_bulten} Sayı")
     st.markdown(f"**İndekslenen Gelişme:** {total_haber:,}")
     st.divider()
