@@ -7,6 +7,112 @@ st.set_page_config(page_title="Tipografi Bülteni Arama Motoru", page_icon="🔤
 
 DB_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "tipografi_arsivi.db")
 
+# 93 bültenin orijinal Medium ve Substack bağlantı arşivi
+BULTEN_URLS = {
+    "Ocak 2019": "https://medium.com/tipografi/tipografi-haberleri-ocak-2019-604f7ccb2b07",
+    "Şubat 2019": "https://medium.com/tipografi/tipografi-haberleri-şubat-2019-20a4558cf898",
+    "Mart 2019": "https://medium.com/tipografi/tipografi-haberleri-mart-2019-27f1060df7bc",
+    "Nisan 2019": "https://medium.com/tipografi/tipografi-haberleri-nisan-2019-ad2ff81a02a7",
+    "Mayıs 2019": "https://medium.com/tipografi/tipografi-haberleri-mayıs-2019-b0fe22fb7228",
+    "Haziran 2019": "https://medium.com/tipografi/tipografi-haberleri-haziran-2019-cdcb17025b40",
+    "Temmuz 2019": "https://medium.com/tipografi/tipografi-haberleri-temmuz-2019-153421028174",
+    "Ağustos 2019": "https://medium.com/tipografi/tipografi-haberleri-ağustos-2019-f19b996e323f",
+    "Eylül 2019": "https://medium.com/tipografi/tipografi-haberleri-eylül-2019-6c85e8d07d41",
+    "Ekim 2019": "https://medium.com/tipografi/tipografi-haberleri-ekim-2019-9d95ca9dc851",
+    "Kasım 2019": "https://medium.com/tipografi/tipografi-haberleri-kasım-2019-1068f7aba186",
+    "Aralık 2019": "https://medium.com/tipografi/tipografi-haberleri-aralık-2019-b655b51e2939",
+    "Ocak 2020": "https://medium.com/tipografi/tipografi-haberleri-ocak-2020-5cd73e88420c",
+    "Şubat 2020": "https://medium.com/tipografi/tipografi-haberleri-şubat-2020-4942a3299f3e",
+    "Mart 2020": "https://medium.com/tipografi/tipografi-haberleri-mart-2020-d4b96a791d32",
+    "Nisan 2020": "https://medium.com/tipografi/tipografi-haberleri-nisan-2020-c3da4f9a1e28",
+    "Mayıs 2020": "https://medium.com/tipografi/tipografi-haberleri-mayıs-2020-15f2875c5a19",
+    "Haziran 2020": "https://medium.com/tipografi/tipografi-haberleri-haziran-2020-ba2a3e54fb51",
+    "Temmuz 2020": "https://medium.com/tipografi/tipografi-haberleri-temmuz-2020-f398d60949d7",
+    "Ağustos 2020": "https://medium.com/tipografi/tipografi-haberleri-ağustos-2020-6cd4fcbd9a3b",
+    "Eylül 2020": "https://medium.com/tipografi/tipografi-haberleri-eylül-2020-7cb342277bd3",
+    "Ekim 2020": "https://medium.com/tipografi/tipografi-haberleri-ekim-2020-a04d29bed91b",
+    "Kasım 2020": "https://medium.com/tipografi/tipografi-haberleri-kasım-2020-e0d7c2fc6b9f",
+    "Aralık 2020": "https://medium.com/tipografi/tipografi-haberleri-aralık-2020-d881afb1a230",
+    "Ocak 2021": "https://medium.com/tipografi/tipografi-haberleri-ocak-2021-3429aabca4ed",
+    "Şubat 2021": "https://medium.com/tipografi/tipografi-haberleri-şubat-2021-6b4d000da517",
+    "Mart 2021": "https://medium.com/tipografi/tipografi-haberleri-mart-2021-2b733a4da85d",
+    "Nisan 2021": "https://medium.com/tipografi/tipografi-haberleri-nisan-2021-fd6cdff4e9c4",
+    "Mayıs 2021": "https://medium.com/tipografi/tipografi-haberleri-mayıs-2021-d8cf2966d3ea",
+    "Haziran 2021": "https://medium.com/tipografi/tipografi-haberleri-haziran-2021-623c191197a7",
+    "Temmuz 2021": "https://medium.com/tipografi/tipografi-haberleri-temmuz-2021-83e6b71d3f15",
+    "Ağustos 2021": "https://medium.com/tipografi/tipografi-haberleri-ağustos-2021-b87f55e89171",
+    "Eylül 2021": "https://medium.com/tipografi/tipografi-haberleri-eylül-2021-9ac0312435e3",
+    "Ekim 2021": "https://medium.com/tipografi/tipografi-haberleri-ekim-2021-cfac56c9bf63",
+    "Kasım 2021": "https://medium.com/tipografi/tipografi-haberleri-kasım-2021-315e190a2dca",
+    "Aralık 2021": "https://medium.com/tipografi/tipografi-haberleri-aralık-2021-28519238bd95",
+    "Ocak 2022": "https://medium.com/tipografi/tipografi-haberleri-ocak-2022-c3389a6d20f7",
+    "Şubat 2022": "https://medium.com/tipografi/tipografi-haberleri-şubat-2022-9d9bcbc58c9c",
+    "Mart 2022": "https://medium.com/tipografi/tipografi-haberleri-mart-2022-8b40ca83e307",
+    "Nisan 2022": "https://medium.com/tipografi/tipografi-haberleri-nisan-2022-23a68f22d53",
+    "Mayıs 2022": "https://medium.com/tipografi/tipografi-haberleri-mayıs-2022-c258249bd466",
+    "Haziran 2022": "https://medium.com/tipografi/tipografi-haberleri-haziran-2022-55f6efe264b",
+    "Temmuz 2022": "https://medium.com/tipografi/tipografi-haberleri-temmuz-2022-5bef2d0161ed",
+    "Ağustos 2022": "https://medium.com/tipografi/tipografi-haberleri-ağustos-2022-16cd48b4cf42",
+    "Eylül 2022": "https://medium.com/tipografi/tipografi-haberleri-eylül-2022-971dc3981ffd",
+    "Ekim 2022": "https://medium.com/tipografi/tipografi-haberleri-ekim-2022-a5a2414d62b8",
+    "Kasım 2022": "https://medium.com/tipografi/tipografi-haberleri-kasım-2022-4f991e4c973b",
+    "Aralık 2022": "https://medium.com/tipografi/tipografi-haberleri-aralık-2022-812bc46e6f13",
+    "Ocak 2023": "https://medium.com/tipografi/tipografi-bülteni-ocak-2023-9dfac3c77718",
+    "Şubat 2023": "https://medium.com/tipografi/tipografi-bülteni-şubat-2023-61bc8fd552ce",
+    "Mart 2023": "https://medium.com/tipografi/tipografi-bülteni-mart-2023-3a93154ac01b",
+    "Nisan 2023": "https://medium.com/tipografi/tipografi-bülteni-nisan-2023-a14f05be724a",
+    "Mayıs 2023": "https://medium.com/tipografi/tipografi-bülteni-mayıs-2023-805c3ba8bd36",
+    "Haziran 2023": "https://medium.com/tipografi/tipografi-bülteni-haziran-2023-66206d1949ee",
+    "Temmuz 2023": "https://medium.com/tipografi/tipografi-bülteni-temmuz-2023-677cf7be9318",
+    "Ağustos 2023": "https://medium.com/tipografi/tipografi-bülteni-ağustos-2023-5ee8b04702ec",
+    "Eylül 2023": "https://medium.com/tipografi/tipografi-bülteni-eylül-2023-92014965a49a",
+    "Ekim 2023": "https://medium.com/tipografi/tipografi-bülteni-ekim-2023-8dfb252f2a1b",
+    "Kasım 2023": "https://medium.com/tipografi/tipografi-bülteni-kasım-2023-2ba98f905d1f",
+    "Aralık 2023": "https://medium.com/tipografi/tipografi-bülteni-aralık-2023-dc3a5cc03c6a",
+    "Ocak 2024": "https://medium.com/tipografi/tipografi-bülteni-ocak-2024-92f521042bae",
+    "Şubat 2024": "https://medium.com/tipografi/tipografi-bülteni-şubat-2024-c2e94d6a58ae",
+    "Mart 2024": "https://medium.com/tipografi/tipografi-bülteni-mart-2024-7dbe9c27c694",
+    "Nisan 2024": "https://medium.com/tipografi/tipografi-bülteni-nisan-2024-df8f79c906db",
+    "Mayıs 2024": "https://medium.com/tipografi/tipografi-bülteni-mayıs-2024-b4a80020ec7f",
+    "Haziran 2024": "https://medium.com/tipografi/tipografi-bülteni-haziran-2024-2db3b5b4b237",
+    "Temmuz 2024": "https://medium.com/tipografi/tipografi-bülteni-temmuz-2024-1e68e9d4a48c",
+    "Ağustos 2024": "https://medium.com/tipografi/tipografi-bülteni-ağustos-2024-d8271c2ec119",
+    "Eylül 2024": "https://medium.com/tipografi/tipografi-bülteni-eylül-2024-03f75b4d6162",
+    "Ekim 2024": "https://medium.com/tipografi/tipografi-bülteni-ekim-2024-6f8a5ee599fc",
+    "Kasım 2024": "https://medium.com/tipografi/tipografi-bülteni-kasım-2024-7ac6873bb581",
+    "Aralık 2024": "https://medium.com/tipografi/tipografi-bülteni-aralık-2024-b5fc8e46b4ce",
+    "Ocak 2025": "https://medium.com/tipografi/tipografi-bülteni-ocak-2025-4f4f7ad5aca1",
+    "Şubat 2025": "https://medium.com/tipografi/tipografi-bülteni-şubat-2025-d8c2206c0274",
+    "Mart 2025": "https://medium.com/tipografi/tipografi-bülteni-mart-2025-09e6ff1f9a12",
+    "Nisan 2025": "https://medium.com/tipografi/tipografi-bülteni-nisan-2025-9ca46327e554",
+    "Mayıs 2025": "https://medium.com/tipografi/tipografi-bülteni-mayıs-2025-81cc9ee02d83",
+    "Haziran 2025": "https://medium.com/tipografi/tipografi-bülteni-haziran-2025-057366758db6",
+    "Temmuz 2025": "https://medium.com/tipografi/tipografi-bülteni-temmuz-2025-f69f62427adc",
+    "Ağustos 2025": "https://medium.com/tipografi/tipografi-bülteni-ağustos-2025-410f52e44a70",
+    "Eylül 2025": "https://medium.com/tipografi/tipografi-bülteni-eylül-2025-fa7a0941bd68",
+    "Ekim 2025": "https://medium.com/tipografi/tipografi-bülteni-ekim-2025-803661d110ac",
+    "Kasım 2025": "https://medium.com/tipografi/tipografi-bülteni-kasım-2025-6a52698d71d0",
+    "Aralık 2025": "https://medium.com/tipografi/tipografi-bülteni-aralık-2025-119b6d532a2b",
+    "Ocak 2026": "https://tipografi.substack.com/p/tipografi-bulteni-ocak-2026",
+    "Şubat 2026": "https://tipografi.substack.com/p/tipografi-bulteni-subat-2026",
+    "Mart 2026": "https://tipografi.substack.com/p/tipografi-bulteni-mart-2026",
+    "Nisan 2026": "https://tipografi.substack.com/p/tipografi-bulteni-nisan-2026",
+    "Mayıs 2026": "https://tipografi.substack.com/p/tipografi-bulteni-mays-2026",
+    "Haziran 2026": "https://tipografi.substack.com/p/tipografi-bulteni-haziran-2026",
+    "Temmuz 2026": "https://tipografi.substack.com/p/tipografi-bulteni-temmuz-2026",
+    "Ağustos 2026": "https://tipografi.substack.com/p/tipografi-bulteni-agustos-2026",
+    "Eylül 2026": "https://tipografi.substack.com/p/tipografi-bulteni-eylul-2026"
+}
+
+def get_bulten_url(temiz_bulten, yil):
+    if temiz_bulten in BULTEN_URLS:
+        return BULTEN_URLS[temiz_bulten]
+    
+    # Gelecek sayılar için otomatik Substack linki oluştur
+    tr_map = str.maketrans("çğıöşüÇĞİÖŞÜ", "cgiosuCGIOSU")
+    slug = temiz_bulten.lower().translate(tr_map).replace(" ", "-")
+    return f"https://tipografi.substack.com/p/{slug}"
+
 @st.cache_resource
 def get_connection():
     return sqlite3.connect(DB_FILE, check_same_thread=False)
@@ -38,7 +144,6 @@ with col2:
     yil_secim = st.selectbox("Yıl Filtresi", ["Tümü", "2026", "2025", "2024", "2023", "2022", "2021", "2020", "2019"])
 
 def gorsel_satirlarini_temizle(metin):
-    # Görsel ve Görsel/Video atıf satırlarını filtrele
     satirlar = metin.split("\n")
     temiz = [s for s in satirlar if not re.match(r"^\s*(\*|_)?\s*Görsel(\/Video)?\s*:\s*", s, re.IGNORECASE)]
     return "\n".join(temiz).strip()
@@ -67,23 +172,28 @@ if sorgu.strip():
     sonuclar = cur.fetchall()
 
     if sonuclar:
-        kaynaklar = []
+        kaynak_linkleri = []
+        gorulen_kaynaklar = set()
+        
         for r in sonuclar:
             temiz = re.sub(r"^.*?:\s*", "", r[0])
-            if temiz not in kaynaklar:
-                kaynaklar.append(temiz)
+            if temiz not in gorulen_kaynaklar:
+                gorulen_kaynaklar.add(temiz)
+                url = get_bulten_url(temiz, r[1])
+                kaynak_linkleri.append(f"[**{temiz}**]({url})")
 
-        kaynak_str = ", ".join(kaynaklar)
-        st.info(f"**Anahtar Kelime:** `{kelime}`\n\n**Kaynaklar:** {kaynak_str}\n\n**Bulunan Sonuç:** {len(sonuclar)} gelişme")
+        kaynak_str = " • ".join(kaynak_linkleri)
+        st.info(f"**Anahtar Kelime:** `{kelime}`\n\n**Kaynak Bültenler:** {kaynak_str}\n\n**Bulunan Sonuç:** {len(sonuclar)} gelişme")
         st.markdown("---")
         
         for bulten_adi, yil, ay, baslik, icerik in sonuclar:
             temiz_bulten = re.sub(r"^.*?:\s*", "", bulten_adi)
+            bulten_url = get_bulten_url(temiz_bulten, yil)
             temiz_icerik = gorsel_satirlarini_temizle(icerik)
             
             with st.container():
                 st.markdown(f"### {baslik}")
-                st.caption(f"🗓️ **Kaynak:** {temiz_bulten} ({yil})")
+                st.caption(f"🗓️ **Kaynak:** [{temiz_bulten} ({yil})]({bulten_url}) ↗")
                 
                 # "Küçük Puntolar" bölümünde sadece aranan kelimenin geçtiği maddeyi göster
                 if "küçük puntolar" in baslik.lower():
