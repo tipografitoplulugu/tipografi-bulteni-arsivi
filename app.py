@@ -301,8 +301,8 @@ with st.sidebar:
     st.markdown(f"**Toplam Bülten:** {total_bulten} Sayı")
     st.markdown(f"**İndekslenen Gelişme:** {total_haber:,}")
     st.divider()
-    st.markdown("Türkçe Tipografi Topluluğu bülten arşivinde içerik araması yapabilirsin.")
-    st.markdown("🌐 [Substack](https://tipografi.substack.com/) | [Medium](https://medium.com/tipografi)")
+    st.markdown("Türkçe Tipografi Topluluğu'nun 2019'dan bu yana aylık olarak yayımladığı bültenlerde yer alan gelişmeler arasında içerik araması yapabilirsin.")
+    st.markdown("[Substack](https://tipografi.substack.com/) | [Medium](https://medium.com/tipografi)")
 
 # Ana Sayfa Başlığı
 st.title("🔍 Tipografi Bülteni Veritabanı")
