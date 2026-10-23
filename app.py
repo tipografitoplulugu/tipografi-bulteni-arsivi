@@ -5,7 +5,7 @@ import os
 import pandas as pd
 
 st.set_page_config(
-    page_title="Tipografi Bülteni Veritabanı",
+    page_title="Tipografi Bülteni Arşivi",
     page_icon="T",
     layout="wide",
     initial_sidebar_state="expanded"
@@ -301,7 +301,7 @@ with st.sidebar:
     st.markdown(f"**Toplam Bülten:** {total_bulten} Sayı")
     st.markdown(f"**İndekslenen Gelişme:** {total_haber:,}")
     st.divider()
-    st.markdown("2019 yılından bu yana Türkçe Tipografi Topluluğu tarafından aylık olarak yayımlanan Tipografi Bülteni’nin arşivini keşfedin; geçmiş sayılarda yer alan içerikler arasında arama yapın.")
+    st.markdown("2019 yılından bu yana Türkçe Tipografi Topluluğu tarafından aylık olarak yayımlanan Tipografi Bülteni’nin arşivini keşfedin, geçmiş sayılarda yer alan içerikler arasında arama yapın.")
     st.markdown("[Substack](https://tipografi.substack.com/) | [Medium](https://medium.com/tipografi)")
 
 # Ana Sayfa Başlığı
