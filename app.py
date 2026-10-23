@@ -2,12 +2,52 @@ import streamlit as st
 import sqlite3
 import re
 import os
+import pandas as pd
 
-st.set_page_config(page_title="Tipografi Bülteni Arama Motoru", page_icon="🔤", layout="wide")
+st.set_page_config(
+    page_title="Tipografi Bülteni Arama Motoru",
+    page_icon="🔤",
+    layout="wide",
+    initial_sidebar_state="expanded"
+)
+
+# Tipografik Stil: Başlıklar Alegreya, Metinler SF Pro
+st.markdown("""
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Alegreya:ital,wght@0,400..900;1,400..900&display=swap');
+
+/* Başlıklar: Substack tarzı Alegreya */
+h1, h2, h3, h4, h5, h6, .stTitle, [data-testid="stHeadingWithActionElements"] {
+    font-family: 'Alegreya', Georgia, serif !important;
+    font-weight: 700 !important;
+    letter-spacing: -0.015em !important;
+}
+
+/* Gövde Metinleri ve Arayüz: Apple SF Pro */
+html, body, [class*="css"], .stMarkdown, p, span, div, input, button, select, [data-testid="stMetricValue"] {
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
+}
+
+/* Fosforlu Arama Vurgusu (Highlight) */
+mark {
+    background-color: #fef08a !important;
+    color: #111827 !important;
+    padding: 0.12em 0.3em !important;
+    border-radius: 0.25em !important;
+    font-weight: 600 !important;
+}
+
+/* Kart ayracı */
+hr {
+    margin-top: 1.5rem !important;
+    margin-bottom: 1.5rem !important;
+}
+</style>
+""", unsafe_allow_html=True)
 
 DB_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "tipografi_arsivi.db")
 
-# 93 bültenin orijinal Medium ve Substack bağlantı arşivi
+# 93 bültenin orijinal Medium ve Substack bağlantıları
 BULTEN_URLS = {
     "Ocak 2019": "https://medium.com/tipografi/tipografi-haberleri-ocak-2019-604f7ccb2b07",
     "Şubat 2019": "https://medium.com/tipografi/tipografi-haberleri-şubat-2019-20a4558cf898",
@@ -104,14 +144,39 @@ BULTEN_URLS = {
     "Eylül 2026": "https://tipografi.substack.com/p/tipografi-bulteni-eylul-2026"
 }
 
+POPULER_ETIKETLER = [
+    "Değişken Yazıtipi", "Monotype", "Gutenberg", "Yapay Zekâ",
+    "Lisanslama", "Kaligrafi", "TDC", "Google Fonts", "Arial"
+]
+
 def get_bulten_url(temiz_bulten, yil):
     if temiz_bulten in BULTEN_URLS:
         return BULTEN_URLS[temiz_bulten]
     
-    # Gelecek sayılar için otomatik Substack linki oluştur
+    # Gelecek bültenler için otomatik Substack bağlantısı
     tr_map = str.maketrans("çğıöşüÇĞİÖŞÜ", "cgiosuCGIOSU")
     slug = temiz_bulten.lower().translate(tr_map).replace(" ", "-")
     return f"https://tipografi.substack.com/p/{slug}"
+
+def highlight_keyword(text, keyword):
+    if not keyword or not keyword.strip():
+        return text
+    def repl(m):
+        full = m.group(0)
+        if full.startswith("[") and "](<" in full and full.endswith(">)"):
+            anchor, url = full[1:-1].split("](", 1)
+            highlighted_anchor = re.sub(re.escape(keyword), r"<mark>\g<0></mark>", anchor, flags=re.IGNORECASE)
+            return f"[{highlighted_anchor}]({url})"
+        else:
+            return f"<mark>{full}</mark>"
+
+    pattern = re.compile(rf"(\[[^\]]+\]\([^\)]+\)|{re.escape(keyword)})", flags=re.IGNORECASE)
+    return pattern.sub(repl, text)
+
+def gorsel_satirlarini_temizle(metin):
+    satirlar = metin.split("\n")
+    temiz = [s for s in satirlar if not re.match(r"^\s*(\*|_)?\s*Görsel(\/Video)?\s*:\s*", s, re.IGNORECASE)]
+    return "\n".join(temiz).strip()
 
 @st.cache_resource
 def get_connection():
@@ -129,27 +194,44 @@ with st.sidebar:
     st.title("🔤 Tipografi Bülteni")
     st.markdown("**Arşiv Kapsamı:** 2019 – 2026")
     st.metric("Toplam Bülten", f"{total_bulten} Sayı")
-    st.metric("İndekslenen Haber", f"{total_haber:,}")
+    st.metric("İndekslenen Gelişme", f"{total_haber:,}")
     st.divider()
     st.markdown("Türkçe Tipografi Topluluğu bülten arşivinde başlık ve içerik araması yapabilirsiniz.")
+    st.markdown("🌐 [Substack](https://tipografi.substack.com/) | [Medium](https://medium.com/tipografi)")
 
 # Ana Sayfa
 st.title("🔍 Tipografi Bülteni Gelişmeler Veritabanı")
-st.markdown("Arşivde yer alan 90+ bülten içindeki tüm gelişmeleri, terimleri ve haberleri arayın.")
+st.markdown("Arşivde yer alan **90+ bülten** içindeki tüm gelişmeleri, terimleri ve haberleri arayın.")
 
-col1, col2 = st.columns([4, 1])
-with col1:
-    sorgu = st.text_input("Arama Terimi", placeholder="örn: değişken yazıtipi, monotype, gutenberg, kaligrafi, yapay zeka...")
-with col2:
-    yil_secim = st.selectbox("Yıl Filtresi", ["Tümü", "2026", "2025", "2024", "2023", "2022", "2021", "2020", "2019"])
+# Popüler Konu Etiketleri
+if "secili_etiket" not in st.session_state:
+    st.session_state["secili_etiket"] = ""
 
-def gorsel_satirlarini_temizle(metin):
-    satirlar = metin.split("\n")
-    temiz = [s for s in satirlar if not re.match(r"^\s*(\*|_)?\s*Görsel(\/Video)?\s*:\s*", s, re.IGNORECASE)]
-    return "\n".join(temiz).strip()
+st.write("**Popüler Konular:**")
+cols = st.columns(len(POPULER_ETIKETLER))
+for i, tag in enumerate(POPULER_ETIKETLER):
+    if cols[i].button(tag, key=f"btn_{i}", use_container_width=True):
+        st.session_state["secili_etiket"] = tag
 
-if sorgu.strip():
-    kelime = sorgu.strip()
+# Arama Alanı
+col_search, col_filter = st.columns([4, 1])
+with col_search:
+    sorgu_input = st.text_input(
+        "Arama Terimi",
+        value=st.session_state.get("secili_etiket", ""),
+        placeholder="örn: değişken yazıtipi, monotype, gutenberg, kaligrafi, yapay zeka...",
+        label_visibility="collapsed"
+    )
+with col_filter:
+    yil_secim = st.selectbox(
+        "Yıl Filtresi",
+        ["Tümü", "2026", "2025", "2024", "2023", "2022", "2021", "2020", "2019"],
+        label_visibility="collapsed"
+    )
+
+kelime = sorgu_input.strip()
+
+if kelime:
     fts_sorgu = f'"{kelime}"'
     
     if yil_secim == "Tümü":
@@ -172,27 +254,46 @@ if sorgu.strip():
     sonuclar = cur.fetchall()
 
     if sonuclar:
+        # Kaynakları topla ve tıklanabilir link yap
         kaynak_linkleri = []
         gorulen_kaynaklar = set()
+        yil_dagilimi = {y: 0 for y in range(2019, 2027)}
         
         for r in sonuclar:
             temiz = re.sub(r"^.*?:\s*", "", r[0])
+            r_yil = r[1]
+            if r_yil in yil_dagilimi:
+                yil_dagilimi[r_yil] += 1
             if temiz not in gorulen_kaynaklar:
                 gorulen_kaynaklar.add(temiz)
-                url = get_bulten_url(temiz, r[1])
+                url = get_bulten_url(temiz, r_yil)
                 kaynak_linkleri.append(f"[**{temiz}**]({url})")
 
         kaynak_str = " • ".join(kaynak_linkleri)
         st.info(f"**Anahtar Kelime:** `{kelime}`\n\n**Kaynak Bültenler:** {kaynak_str}\n\n**Bulunan Sonuç:** {len(sonuclar)} gelişme")
+
+        # Zaman Çizelgesi Grafiği
+        df_trend = pd.DataFrame(
+            [{"Yıl": str(y), "Gelişme Sayısı": count} for y, count in yil_dagilimi.items()]
+        ).set_index("Yıl")
+
+        with st.expander("📊 Yıllara Göre Dağılım Grafiği (Zaman Çizelgesi)", expanded=False):
+            st.bar_chart(df_trend, height=200)
+
         st.markdown("---")
         
+        # Sonuç Kartları
         for bulten_adi, yil, ay, baslik, icerik in sonuclar:
             temiz_bulten = re.sub(r"^.*?:\s*", "", bulten_adi)
             bulten_url = get_bulten_url(temiz_bulten, yil)
             temiz_icerik = gorsel_satirlarini_temizle(icerik)
             
             with st.container():
-                st.markdown(f"### {baslik}")
+                # Başlığı vurgula
+                vurgulu_baslik = highlight_keyword(baslik, kelime)
+                st.markdown(f"### {vurgulu_baslik}", unsafe_allow_html=True)
+                
+                # Tıklanabilir Kaynak ve Tarih
                 st.caption(f"🗓️ **Kaynak:** [{temiz_bulten} ({yil})]({bulten_url}) ↗")
                 
                 # "Küçük Puntolar" bölümünde sadece aranan kelimenin geçtiği maddeyi göster
@@ -202,17 +303,33 @@ if sorgu.strip():
                     
                     if eslesenler:
                         for madde in eslesenler:
-                            st.markdown(madde)
+                            vurgulu_madde = highlight_keyword(madde, kelime)
+                            st.markdown(vurgulu_madde, unsafe_allow_html=True)
                         
                         with st.expander("📌 Bu sayının tüm Küçük Puntolar maddelerini göster"):
-                            st.markdown(temiz_icerik)
+                            vurgulu_tamami = highlight_keyword(temiz_icerik, kelime)
+                            st.markdown(vurgulu_tamami, unsafe_allow_html=True)
                     else:
-                        st.markdown(temiz_icerik)
+                        vurgulu_icerik = highlight_keyword(temiz_icerik, kelime)
+                        st.markdown(vurgulu_icerik, unsafe_allow_html=True)
                 else:
-                    st.markdown(temiz_icerik)
-                    
+                    vurgulu_icerik = highlight_keyword(temiz_icerik, kelime)
+                    st.markdown(vurgulu_icerik, unsafe_allow_html=True)
+                
+                # Alıntıla (Cite) Butonu
+                temiz_baslik_duz = re.sub(r"[*_`#]", "", baslik).strip()
+                alinti_metni = f'Türkçe Tipografi Topluluğu. ({yil}, {ay}). "{temiz_baslik_duz}". Tipografi Bülteni. Erişim: {bulten_url}'
+                
+                if hasattr(st, "popover"):
+                    with st.popover("📖 Alıntıla (Cite)"):
+                        st.code(alinti_metni, language="text")
+                        st.caption("APA / Editoryal alıntı formatı. Sağ üstteki simgeden tek tıkla kopyalayabilirsiniz.")
+                else:
+                    with st.expander("📖 Alıntı Formatı (Cite)"):
+                        st.code(alinti_metni, language="text")
+                        
                 st.divider()
     else:
         st.warning(f"'{kelime}' ile eşleşen bir haber bulunamadı.")
 else:
-    st.write("Aramak istediğiniz terimi yukarıdaki kutucuğa yazın.")
+    st.write("Aramak istediğiniz terimi yukarıdaki kutucuğa yazın veya popüler konulardan birine tıklayın.")
