@@ -5,7 +5,7 @@ import os
 import pandas as pd
 
 st.set_page_config(
-    page_title="Tipografi Bülteni Arama Motoru",
+    page_title="Tipografi Bülteni Veritabanı",
     page_icon="T",
     layout="wide",
     initial_sidebar_state="expanded"
@@ -296,7 +296,7 @@ total_bulten, total_haber = cur.fetchone()
 # Kenar Çubuğu
 with st.sidebar:
     st.image("logo.png", width=120)
-    st.title("Tipografi Bülteni")
+    st.title("Türkçe Tipografi Topluluğu")
     st.markdown("**Arşiv Kapsamı:** 2019–2026")
     st.markdown(f"**Toplam Bülten:** {total_bulten} Sayı")
     st.markdown(f"**İndekslenen Gelişme:** {total_haber:,}")
