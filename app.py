@@ -82,16 +82,16 @@ mark {
 
 /* 6. Popüler Konu Butonları (Arama Alanının Altında Düşük Opaklıklı Haplar) */
 .tag-section-title {
-    font-size: 0.82rem !important;
-    opacity: 0.65 !important;
+    font-size: 0.78rem !important;
+    opacity: 0.5 !important;
     margin-top: 0.2rem !important;
     margin-bottom: 0.35rem !important;
     font-weight: 500 !important;
 }
 
 div[data-testid="stHorizontalBlock"] button {
-    opacity: 0.65 !important;
-    font-size: 0.78rem !important;
+    opacity: 0.5 !important;
+    font-size: 0.72rem !important;
     padding: 0.2rem 0.5rem !important;
     min-height: 28px !important;
     height: 28px !important;
