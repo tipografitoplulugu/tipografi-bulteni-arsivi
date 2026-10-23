@@ -76,7 +76,23 @@ if sorgu.strip():
             with st.container():
                 st.markdown(f"### {baslik}")
                 st.caption(f"🗓️ **Kaynak:** {temiz_bulten} ({yil})")
-                st.markdown(icerik)
+                
+                # "Küçük Puntolar" bölümünde sadece aranan kelimenin geçtiği maddeyi göster
+                if "küçük puntolar" in baslik.lower():
+                    satirlar = [s.strip() for s in icerik.split("\n") if s.strip()]
+                    eslesenler = [s for s in satirlar if kelime.lower() in s.lower()]
+                    
+                    if eslesenler:
+                        for madde in eslesenler:
+                            st.markdown(madde)
+                        
+                        with st.expander("📌 Bu sayının tüm Küçük Puntolar maddelerini göster"):
+                            st.markdown(icerik)
+                    else:
+                        st.markdown(icerik)
+                else:
+                    st.markdown(icerik)
+                    
                 st.divider()
     else:
         st.warning(f"'{kelime}' ile eşleşen bir haber bulunamadı.")
