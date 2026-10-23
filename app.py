@@ -5,7 +5,7 @@ import os
 import pandas as pd
 
 st.set_page_config(
-    page_title="Tipografi Bülteni Veritabanı",
+    page_title="Tipografi Bülteni Arşivi",
     page_icon="T",
     layout="wide",
     initial_sidebar_state="expanded"
