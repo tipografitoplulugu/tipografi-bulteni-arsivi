@@ -141,6 +141,11 @@ html, body, .stApp, [data-testid="stAppViewContainer"], [data-testid="stHeader"]
 [data-testid="stSidebarContent"], section[data-testid="stSidebar"] {
     background-color: #121212 !important;
 }
+
+/* 9. Sidebar – Body Ayırıcı Dikey Çizgi */
+section[data-testid="stSidebar"] {
+    border-right: 1px solid rgba(255, 255, 255, 0.25) !important;
+}
 </style>
 """, unsafe_allow_html=True)
 
