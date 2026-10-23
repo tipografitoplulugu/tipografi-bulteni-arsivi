@@ -297,16 +297,16 @@ total_bulten, total_haber = cur.fetchone()
 with st.sidebar:
     st.image("logo.png", width=120)
     st.title("Tipografi Bülteni")
-    st.markdown("**Arşiv Kapsamı:** 2019 – 2026")
+    st.markdown("**Arşiv Kapsamı:** 2019–2026")
     st.markdown(f"**Toplam Bülten:** {total_bulten} Sayı")
     st.markdown(f"**İndekslenen Gelişme:** {total_haber:,}")
     st.divider()
-    st.markdown("Türkçe Tipografi Topluluğu bülten arşivinde başlık ve içerik araması yapabilirsiniz.")
+    st.markdown("Türkçe Tipografi Topluluğu bülten arşivinde içerik araması yapabilirsin.")
     st.markdown("🌐 [Substack](https://tipografi.substack.com/) | [Medium](https://medium.com/tipografi)")
 
 # Ana Sayfa Başlığı
-st.title("🔍 Tipografi Bülteni Gelişmeler Veritabanı")
-st.markdown("Arşivde yer alan **90+ bülten** içindeki tüm gelişmeleri, terimleri ve haberleri arayın.")
+st.title("🔍 Tipografi Bülteni Veritabanı")
+st.markdown("Arşivde yer alan **90+ bülten** içindeki tüm gelişmeleri, terimleri ve haberleri arayabilirsin.")
 
 if "secili_etiket" not in st.session_state:
     st.session_state["secili_etiket"] = ""
