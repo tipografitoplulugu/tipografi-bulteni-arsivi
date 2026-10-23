@@ -37,6 +37,12 @@ with col1:
 with col2:
     yil_secim = st.selectbox("Yıl Filtresi", ["Tümü", "2026", "2025", "2024", "2023", "2022", "2021", "2020", "2019"])
 
+def gorsel_satirlarini_temizle(metin):
+    # Görsel ve Görsel/Video atıf satırlarını filtrele
+    satirlar = metin.split("\n")
+    temiz = [s for s in satirlar if not re.match(r"^\s*(\*|_)?\s*Görsel(\/Video)?\s*:\s*", s, re.IGNORECASE)]
+    return "\n".join(temiz).strip()
+
 if sorgu.strip():
     kelime = sorgu.strip()
     fts_sorgu = f'"{kelime}"'
@@ -73,13 +79,15 @@ if sorgu.strip():
         
         for bulten_adi, yil, ay, baslik, icerik in sonuclar:
             temiz_bulten = re.sub(r"^.*?:\s*", "", bulten_adi)
+            temiz_icerik = gorsel_satirlarini_temizle(icerik)
+            
             with st.container():
                 st.markdown(f"### {baslik}")
                 st.caption(f"🗓️ **Kaynak:** {temiz_bulten} ({yil})")
                 
                 # "Küçük Puntolar" bölümünde sadece aranan kelimenin geçtiği maddeyi göster
                 if "küçük puntolar" in baslik.lower():
-                    satirlar = [s.strip() for s in icerik.split("\n") if s.strip()]
+                    satirlar = [s.strip() for s in temiz_icerik.split("\n") if s.strip()]
                     eslesenler = [s for s in satirlar if kelime.lower() in s.lower()]
                     
                     if eslesenler:
@@ -87,11 +95,11 @@ if sorgu.strip():
                             st.markdown(madde)
                         
                         with st.expander("📌 Bu sayının tüm Küçük Puntolar maddelerini göster"):
-                            st.markdown(icerik)
+                            st.markdown(temiz_icerik)
                     else:
-                        st.markdown(icerik)
+                        st.markdown(temiz_icerik)
                 else:
-                    st.markdown(icerik)
+                    st.markdown(temiz_icerik)
                     
                 st.divider()
     else:
