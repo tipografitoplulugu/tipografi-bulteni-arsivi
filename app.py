@@ -5,7 +5,7 @@ import os
 import pandas as pd
 
 st.set_page_config(
-    page_title="Tipografi Bülteni Arşivi",
+    page_title="Tipografi Bülteni Veritabanı",
     page_icon="T",
     layout="wide",
     initial_sidebar_state="expanded"
@@ -305,7 +305,7 @@ with st.sidebar:
     st.markdown("[Substack](https://tipografi.substack.com/) | [Medium](https://medium.com/tipografi)")
 
 # Ana Sayfa Başlığı
-st.title("🔍 Tipografi Bülteni Arşivi)
+st.title("🔍 Tipografi Bülteni Arşivi")
 st.markdown("Arşivde yer alan **90+ bülten** içindeki tüm gelişmeleri, terimleri ve haberleri arayın.")
 
 if "secili_etiket" not in st.session_state:
