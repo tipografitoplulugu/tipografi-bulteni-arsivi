@@ -247,10 +247,10 @@ THEME_BOOTSTRAP = f"""
     parentWindow.__archiveThemeObserver = new MutationObserver(handleObserver);
     parentWindow.__archiveThemeObserver.observe(parentWindow.document.body, {{ childList: true, subtree: true }});
   }}
-  if (!parentWindow.document.querySelector("link[href*='family=Inter']")) {{
+  if (!parentWindow.document.querySelector("link[href*='family=DM+Mono']")) {{
     const linkFont = parentWindow.document.createElement("link");
     linkFont.rel = "stylesheet";
-    linkFont.href = "https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700&display=swap";
+    linkFont.href = "https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,400&family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700&display=swap";
     parentWindow.document.head.appendChild(linkFont);
   }}
 }})();
@@ -265,7 +265,7 @@ st.markdown(
 st.markdown(
     """
     <style>
-    @import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,400&family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700&display=swap');
 
     html, body, [data-testid="stAppViewContainer"], [data-testid="stMain"] {
         background: var(--paper);
@@ -309,7 +309,8 @@ st.markdown(
         min-width: 0;
         gap: .5rem;
         color: var(--muted);
-        font-size: .88rem;
+        font-family: "DM Mono", monospace;
+        font-size: .84rem;
         white-space: nowrap;
     }
     .brand-name { font-size: 1.08rem; font-weight: 650; letter-spacing: .01em; }
@@ -341,8 +342,9 @@ st.markdown(
         background: var(--theme-icon-image) center / contain no-repeat;
     }
     .hero-eyebrow, .section-eyebrow {
-        color: var(--link); font-size: .72rem; font-weight: 700;
-        letter-spacing: .13em; text-transform: uppercase;
+        font-family: "DM Mono", monospace;
+        color: var(--link); font-size: .72rem; font-weight: 500;
+        letter-spacing: .12em; text-transform: uppercase;
         display: block;
         margin-bottom: .65rem;
     }
@@ -366,11 +368,12 @@ st.markdown(
     }
     .stat-item { min-width: 0; }
     .stat-label {
+        font-family: "DM Mono", monospace;
         margin-bottom: .2rem;
         color: var(--muted);
-        font-size: .75rem;
+        font-size: .72rem;
         line-height: 1.4;
-        letter-spacing: .04em;
+        letter-spacing: .06em;
         text-transform: uppercase;
     }
     .stat-value {
@@ -380,11 +383,12 @@ st.markdown(
         overflow-wrap: anywhere;
     }
     .archive-footer {
+        font-family: "DM Mono", monospace;
         margin-top: 1.6rem;
         border-top: 1px solid var(--line);
         padding: 1.05rem 0 .2rem;
         color: var(--muted);
-        font-size: .88rem;
+        font-size: .82rem;
         line-height: 1.45;
     }
     .footer-content {
@@ -393,7 +397,12 @@ st.markdown(
         justify-content: space-between;
         gap: .75rem 1.5rem;
     }
-    .footer-name { color: var(--muted); font-size: inherit; font-weight: 500; }
+    .footer-name {
+        font-family: "DM Mono", monospace;
+        color: var(--muted);
+        font-size: inherit;
+        font-weight: 500;
+    }
     .footer-actions {
         display: flex;
         align-items: center;
@@ -401,8 +410,16 @@ st.markdown(
         flex-wrap: wrap;
         gap: .75rem 1.1rem;
     }
-    .footer-subscribe { color: var(--muted); font-size: inherit; }
-    .footer-subscribe a { color: var(--link) !important; font-weight: 550; }
+    .footer-subscribe {
+        font-family: "DM Mono", monospace;
+        color: var(--muted);
+        font-size: inherit;
+    }
+    .footer-subscribe a {
+        font-family: "DM Mono", monospace;
+        color: var(--link) !important;
+        font-weight: 500;
+    }
     .footer-social {
         display: flex;
         align-items: center;
@@ -564,6 +581,7 @@ st.markdown(
         border-radius: 999px;
         background: var(--surface);
         color: var(--ink);
+        font-family: "DM Mono", monospace;
         font-size: .83rem;
         appearance: none !important;
         -webkit-appearance: none !important;
@@ -580,7 +598,9 @@ st.markdown(
         cursor: not-allowed !important;
     }
     [data-testid="stElementContainer"][class*="st-key-topic_"] [data-testid="stButton"] button {
-        opacity: .56;
+        font-family: "DM Mono", monospace;
+        font-size: .82rem;
+        opacity: .6;
         transition: opacity 140ms ease, border-color 140ms ease, background 140ms ease;
     }
     [data-testid="stElementContainer"][class*="st-key-topic_"] [data-testid="stButton"] button:hover,
@@ -596,7 +616,10 @@ st.markdown(
         appearance: none !important;
         -webkit-appearance: none !important;
         box-shadow: none !important;
-        font-weight: 600;
+        font-family: "DM Mono", monospace;
+        font-weight: 500;
+        font-size: .95rem;
+        letter-spacing: .02em;
         padding: 0 1rem !important;
         display: flex;
         align-items: center;
@@ -604,6 +627,7 @@ st.markdown(
     }
     [data-testid="stFormSubmitButton"] button p,
     [data-testid="stFormSubmitButton"] button span {
+        font-family: "DM Mono", monospace !important;
         color: var(--on-accent) !important;
         margin: 0;
         line-height: 1.2;
@@ -627,11 +651,22 @@ st.markdown(
         border: 1px solid var(--line) !important; border-radius: 16px !important;
         background: var(--surface) !important; box-shadow: none !important;
     }
+    .result-summary {
+        font-family: "DM Mono", monospace;
+        font-size: .84rem;
+        color: var(--muted);
+        margin-bottom: .6rem;
+    }
+    .result-summary strong {
+        color: var(--link);
+        font-weight: 500;
+    }
     .result-meta {
+        font-family: "DM Mono", monospace;
         display: flex; flex-wrap: wrap; justify-content: space-between; gap: .35rem 1rem;
         margin-bottom: .6rem; color: var(--muted); font-size: .78rem; letter-spacing: .015em;
     }
-    .result-meta strong { color: var(--link); font-weight: 650; }
+    .result-meta strong { color: var(--link); font-weight: 500; }
     .result-excerpt { margin: .2rem 0 .8rem; color: var(--muted); font-size: .96rem; line-height: 1.72; }
     mark.search-hit { border-radius: 3px; background: var(--accent-soft); color: var(--accent-soft-ink); padding: 0 .12em; }
     [data-testid="stExpander"] {
@@ -1079,7 +1114,7 @@ def copy_button_markup(value: str, theme: dict[str, str]) -> str:
 <html lang="tr">
 <head>
 <meta charset="utf-8">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@500&display=swap">
 <style>
 * {{ box-sizing: border-box; }}
 html, body {{ margin: 0; padding: 0; background: transparent; overflow: hidden; }}
@@ -1087,7 +1122,7 @@ button {{
   display: block; width: 100%; height: 48px; padding: 0 .8rem;
   border: 1px solid {theme['accent']}; border-radius: 10px;
   background: {theme['accent']}; color: {theme['on_accent']};
-  font: 600 .88rem/1.2 "Inter", sans-serif;
+  font: 500 .86rem/1.2 "DM Mono", monospace;
   appearance: none; -webkit-appearance: none; box-shadow: none;
   cursor: pointer; transition: background-color 120ms ease, border-color 120ms ease;
 }}
@@ -1280,8 +1315,9 @@ if query:
 
     if result_count:
         st.markdown(
-            f"**{result_count:,}** gelişme · **{issue_count}** bülten"
-            "　<span style='color:var(--muted)'>·　En yeniden eskiye</span>",
+            f'<div class="result-summary"><strong>{result_count:,}</strong> gelişme · '
+            f'<strong>{issue_count}</strong> bülten'
+            "　<span style='color:var(--muted)'>·　En yeniden eskiye</span></div>",
             unsafe_allow_html=True,
         )
         with st.expander("Yıllara göre dağılım", expanded=False):
@@ -1331,7 +1367,7 @@ if query:
                 },
                 "config": {
                     "view": {"stroke": None},
-                    "axis": {"labelFont": "Inter, sans-serif", "gridWidth": 1},
+                    "axis": {"labelFont": "DM Mono, monospace", "gridWidth": 1},
                 },
             }
             st.vega_lite_chart(
@@ -1399,7 +1435,7 @@ if query:
                 )
             with label_col:
                 st.markdown(
-                    f"<p style='text-align:center;color:var(--muted)'>Sayfa {current_page} / {page_count}</p>",
+                    f"<p style='text-align:center;color:var(--muted);font-family:\"DM Mono\",monospace;font-size:.82rem'>Sayfa {current_page} / {page_count}</p>",
                     unsafe_allow_html=True,
                 )
             with next_col:
