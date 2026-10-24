@@ -93,6 +93,49 @@ st.markdown(
     .hero-rule { border: 0; border-top: 1px solid var(--line); margin: 1.8rem 0 1.5rem; }
     .stat-label { color: var(--muted); font-size: .75rem; letter-spacing: .04em; text-transform: uppercase; }
     .stat-value { margin-top: .25rem; color: var(--ink); font: 1.45rem Georgia, serif; letter-spacing: -.03em; }
+    .archive-footer {
+        margin-top: 1.6rem;
+        border-top: 1px solid var(--line);
+        padding: 1.05rem 0 .2rem;
+        color: var(--muted);
+        font-size: .88rem;
+        line-height: 1.45;
+    }
+    .footer-content {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: .75rem 1.5rem;
+    }
+    .footer-name { color: var(--muted); font-size: inherit; font-weight: 500; }
+    .footer-social {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        flex-wrap: wrap;
+        gap: .85rem;
+    }
+    .footer-social a {
+        display: inline-flex;
+        width: 1.2rem;
+        height: 1.2rem;
+        align-items: center;
+        justify-content: center;
+        color: var(--muted) !important;
+        border-radius: 4px;
+        text-decoration: none !important;
+        transition: color 120ms ease;
+    }
+    .footer-social a:hover { color: var(--accent) !important; }
+    .footer-social svg { display: block; width: 100%; height: 100%; }
+    .footer-social .icon-fill { fill: currentColor; }
+    .footer-social .icon-stroke {
+        fill: none;
+        stroke: currentColor;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        stroke-width: 2;
+    }
     [data-testid="stTextInput"] input,
     [data-testid="stSelectbox"] [role="combobox"],
     [data-testid="stFormSubmitButton"] button {
@@ -281,6 +324,8 @@ st.markdown(
         .hero-copy { font-size: 1rem; }
         .brand-header { align-items: flex-start; flex-direction: column; }
         .brand-links { margin-left: 0; white-space: normal; }
+        .footer-content { align-items: flex-start; flex-direction: column; }
+        .footer-social { justify-content: flex-start; gap: .8rem; }
         .result-meta { flex-direction: column; gap: .2rem; }
         [data-testid="stHorizontalBlock"] { flex-wrap: wrap; gap: .55rem; }
         [data-testid="stHorizontalBlock"] > [data-testid="column"] { min-width: min(100%, 180px); flex: 1 1 180px; }
@@ -900,7 +945,33 @@ else:
         )
 
 st.markdown('<hr class="hero-rule">', unsafe_allow_html=True)
-st.caption(
-    "Tipografi Bülteni, Türkçe Tipografi Topluluğu tarafından 2019’dan bu yana "
-    "yayımlanıyor. Arşiv kayıtları yerel SQLite veritabanından okunur."
+st.markdown(
+    """
+    <footer class="archive-footer" aria-label="Alt bilgi">
+      <div class="footer-content">
+        <div class="footer-name">Türkçe Tipografi Topluluğu</div>
+        <nav class="footer-social" aria-label="Sosyal medya bağlantıları">
+          <a href="https://www.facebook.com/tipografi/" target="_blank" rel="noopener noreferrer" aria-label="Facebook" title="Facebook">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path class="icon-fill" d="M13.6 21v-8.2h2.8l.4-3.2h-3.2V7.5c0-.9.3-1.6 1.6-1.6H17V3.1c-.3 0-1.3-.1-2.4-.1-2.4 0-4.1 1.5-4.1 4.3v2.4H7.8v3.2h2.7V21z"/></svg>
+          </a>
+          <a href="https://x.com/tipografi" target="_blank" rel="noopener noreferrer" aria-label="X" title="X">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path class="icon-fill" d="M18.9 2H22l-6.8 7.8L23 22h-6.2l-4.9-6.4L6.3 22H3.1l7.3-8.4L2.7 2h6.4l4.4 5.9L18.9 2zm-1.1 17.8h1.7L8.4 4.1H6.6z"/></svg>
+          </a>
+          <a href="https://www.instagram.com/tipografitoplulugu/" target="_blank" rel="noopener noreferrer" aria-label="Instagram" title="Instagram">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><rect class="icon-stroke" x="3.2" y="3.2" width="17.6" height="17.6" rx="5.1"/><circle class="icon-stroke" cx="12" cy="12" r="4.1"/><circle class="icon-fill" cx="17.7" cy="6.6" r="1.1"/></svg>
+          </a>
+          <a href="https://www.youtube.com/@tipografi" target="_blank" rel="noopener noreferrer" aria-label="YouTube" title="YouTube">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path class="icon-fill" d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.6 12 3.6 12 3.6s-7.5 0-9.4.5A3 3 0 0 0 .5 6.2 31 31 0 0 0 0 12a31 31 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.5 9.4.5 9.4.5s7.5 0 9.4-.5a3 3 0 0 0 2.1-2.1A31 31 0 0 0 24 12a31 31 0 0 0-.5-5.8z"/><path d="m9.6 15.8 6.2-3.8-6.2-3.8z" fill="var(--paper)"/></svg>
+          </a>
+          <a href="https://open.spotify.com/show/1Ij0BoHaoobj5Mez7mAS22" target="_blank" rel="noopener noreferrer" aria-label="Spotify" title="Spotify">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path class="icon-fill" d="M12 1.8A10.2 10.2 0 1 0 12 22.2 10.2 10.2 0 0 0 12 1.8z"/><path d="M6.2 9.1c3.8-1.1 8.6-.7 11.7 1.2M7 12.1c3.2-.9 7.3-.5 9.9 1.1M7.8 15c2.6-.7 5.8-.4 7.9.9" fill="none" stroke="var(--paper)" stroke-width="1.4" stroke-linecap="round"/></svg>
+          </a>
+          <a href="https://tipografi.substack.com/" target="_blank" rel="noopener noreferrer" aria-label="Substack" title="Substack">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path class="icon-fill" d="M3 4h18v2H3zm0 4h18v2H3zm0 4h18v2H3zm0 4h18v5l-9-3.5L3 21z"/></svg>
+          </a>
+        </nav>
+      </div>
+    </footer>
+    """,
+    unsafe_allow_html=True,
 )
