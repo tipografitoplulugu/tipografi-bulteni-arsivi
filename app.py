@@ -578,7 +578,7 @@ st.markdown(
     [data-testid="stButton"] button {
         min-height: 40px;
         border: 1px solid var(--line);
-        border-radius: 999px;
+        border-radius: 12px !important;
         background: var(--surface);
         color: var(--ink);
         font-family: "DM Mono", monospace;
@@ -598,6 +598,7 @@ st.markdown(
         cursor: not-allowed !important;
     }
     [data-testid="stElementContainer"][class*="st-key-topic_"] [data-testid="stButton"] button {
+        border-radius: 12px !important;
         font-family: "DM Mono", monospace;
         font-size: .82rem;
         opacity: .6;
@@ -611,6 +612,7 @@ st.markdown(
     }
     [data-testid="stFormSubmitButton"] button {
         border: 1px solid var(--accent) !important;
+        border-radius: 12px !important;
         background: var(--accent) !important;
         color: var(--on-accent) !important;
         appearance: none !important;
