@@ -121,30 +121,44 @@ st.markdown(
     [data-testid="stExpander"] {
         border: 1px solid var(--line) !important;
         border-radius: 12px !important;
-        background: var(--surface) !important;
+        background: var(--paper) !important;
         overflow: hidden;
     }
-    [data-testid="stExpander"] summary {
-        color: var(--ink);
+    [data-testid="stExpander"] details,
+    [data-testid="stExpander"] summary,
+    [data-testid="stExpander"] details > summary {
+        background: #f7f6f3 !important;
+        background-image: none !important;
+    }
+    [data-testid="stExpander"] summary,
+    [data-testid="stExpander"] summary p {
+        color: #1d1c1a !important;
         font-size: .9rem;
         font-weight: 560;
-        padding: .2rem .25rem;
+        padding: .45rem .75rem;
+    }
+    [data-testid="stExpander"] summary * { color: #1d1c1a !important; }
+    [data-testid="stExpander"] summary:hover,
+    [data-testid="stExpander"] summary:hover * {
+        background: #f7f6f3 !important;
+        background-image: none !important;
+        color: #1d1c1a !important;
     }
     [data-testid="stExpander"] [data-testid="stExpanderDetails"] {
         border-top: 1px solid var(--line);
         padding: .8rem 1rem .9rem;
-    }
-    [data-testid="stCodeBlock"] {
-        border: 1px solid var(--line) !important;
-        border-radius: 10px !important;
         background: var(--paper) !important;
     }
-    [data-testid="stCodeBlock"] pre,
-    [data-testid="stCodeBlock"] code {
-        background: transparent !important;
-        color: var(--ink) !important;
-        white-space: pre-wrap !important;
+    .citation-box {
+        border: 1px solid var(--line) !important;
+        border-radius: 10px !important;
+        background: #f7f6f3 !important;
+        color: #1d1c1a !important;
+        padding: .85rem 1rem;
+        font-size: .94rem;
+        line-height: 1.65;
         overflow-wrap: anywhere;
+        word-break: normal;
     }
     [data-testid="stCaptionContainer"] { color: var(--muted); }
     hr { border-color: var(--line) !important; }
@@ -581,7 +595,63 @@ else:
             unsafe_allow_html=True,
         )
         with st.expander("Yıllara göre dağılım", expanded=False):
-            st.bar_chart(distribution, height=220, color="#81513e")
+            chart_data = distribution.rename_axis("Yıl").reset_index()
+            chart_spec = {
+                "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+                "description": "Arama sonuçlarının yıllara göre dağılımı.",
+                "background": "#f7f6f3",
+                "height": 220,
+                "mark": {"type": "bar", "color": "#81513e"},
+                "encoding": {
+                    "x": {
+                        "field": "Yıl",
+                        "type": "ordinal",
+                        "sort": None,
+                        "axis": {
+                            "title": None,
+                            "labelAngle": 0,
+                            "labelColor": "#716e68",
+                            "labelFontSize": 12,
+                            "labelPadding": 10,
+                            "tickSize": 0,
+                            "domain": False,
+                        },
+                    },
+                    "y": {
+                        "field": "Gelişme sayısı",
+                        "type": "quantitative",
+                        "axis": {
+                            "title": None,
+                            "labelColor": "#716e68",
+                            "gridColor": "#e6e3dd",
+                            "gridOpacity": 1,
+                            "tickColor": "transparent",
+                            "domain": False,
+                            "format": "d",
+                        },
+                    },
+                    "tooltip": [
+                        {"field": "Yıl", "type": "ordinal", "title": "Yıl"},
+                        {
+                            "field": "Gelişme sayısı",
+                            "type": "quantitative",
+                            "title": "Gelişme sayısı",
+                        },
+                    ],
+                },
+                "config": {
+                    "view": {"stroke": None},
+                    "axis": {"labelFont": "sans-serif", "gridWidth": 1},
+                },
+            }
+            st.vega_lite_chart(
+                chart_data,
+                spec=chart_spec,
+                height=260,
+                use_container_width=True,
+                theme=None,
+                alt="Arama sonuçlarının yıllara göre dağılımı",
+            )
 
         for row in rows:
             clean_issue = issue_name(row["bulten_adi"] or "")
@@ -614,8 +684,10 @@ else:
                     f"{row['ay'] or ''}). {title}. Tipografi Bülteni. {issue_url}"
                 )
                 with st.expander("APA 7 alıntısı", expanded=False):
-                    st.code(citation, language="text")
-                    st.caption("Kaynakçada Tipografi Bülteni adını italik yazabilirsiniz.")
+                    st.markdown(
+                        f'<div class="citation-box">{html.escape(citation)}</div>',
+                        unsafe_allow_html=True,
+                    )
 
         if page_count > 1:
             st.markdown("")
