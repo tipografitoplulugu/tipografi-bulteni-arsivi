@@ -401,7 +401,7 @@ st.markdown(
         font-family: "DM Mono", monospace;
         color: var(--muted);
         font-size: inherit;
-        font-weight: 500;
+        font-weight: 400;
     }
     .footer-actions {
         display: flex;
@@ -414,11 +414,12 @@ st.markdown(
         font-family: "DM Mono", monospace;
         color: var(--muted);
         font-size: inherit;
+        font-weight: 400;
     }
     .footer-subscribe a {
         font-family: "DM Mono", monospace;
         color: var(--link) !important;
-        font-weight: 500;
+        font-weight: 400;
     }
     .footer-social {
         display: flex;
