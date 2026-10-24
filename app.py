@@ -38,6 +38,12 @@ st.markdown(
         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     }
     [data-testid="stHeader"] { background: transparent; }
+    /* Hide Streamlit's in-app toolbar actions (Share, menu, and adjacent
+       controls). The content links below are also left-aligned so they stay
+       clear if the host renders its own toolbar outside the app. */
+    [data-testid="stHeader"],
+    [data-testid="stToolbar"],
+    [data-testid="stAppToolbar"] { display: none !important; }
     [data-testid="stMain"] .block-container { max-width: 1120px; padding: 2rem 2.25rem 5rem; }
     h1, h2, h3, h4 {
         color: var(--ink) !important;
@@ -63,11 +69,18 @@ st.markdown(
         display: flex;
         align-items: center;
         justify-content: space-between;
+        justify-content: flex-start;
         gap: 1rem;
         padding-bottom: .6rem;
     }
     .brand-identity { display: flex; align-items: center; gap: .8rem; }
     .brand-links { color: var(--muted); font-size: .88rem; white-space: nowrap; }
+    .brand-links {
+        margin-left: 1rem;
+        color: var(--muted);
+        font-size: .88rem;
+        white-space: nowrap;
+    }
     .brand-name { font-size: 1.08rem; font-weight: 650; letter-spacing: .01em; }
     .hero-eyebrow, .section-eyebrow {
         color: var(--accent); font-size: .72rem; font-weight: 700;
@@ -271,6 +284,7 @@ st.markdown(
         .hero-copy { font-size: 1rem; }
         .brand-header { align-items: flex-start; flex-direction: column; }
         .brand-links { white-space: normal; }
+        .brand-links { margin-left: 0; white-space: normal; }
         .result-meta { flex-direction: column; gap: .2rem; }
         [data-testid="stHorizontalBlock"] { flex-wrap: wrap; gap: .55rem; }
         [data-testid="stHorizontalBlock"] > [data-testid="column"] { min-width: min(100%, 180px); flex: 1 1 180px; }
@@ -679,6 +693,7 @@ st.markdown(
 )
 
 st.markdown('<hr class="hero-rule">', unsafe_allow_html=True)
+st.markdown('<div class="hero-eyebrow">Yayın arşivi · 2019—2026</div>', unsafe_allow_html=True)
 st.title("Tipografi Bülteni Arşivi")
 st.markdown(
     '<div class="hero-copy">Tipografi kültürüne dair haberleri, yazı tasarımını '
@@ -831,6 +846,7 @@ else:
                 st.markdown(
                     '<div class="result-meta">'
                     f'<strong>{html.escape(clean_issue)}</strong>'
+                    f'<span>{html.escape(str(row["ay"] or ""))} {int(row["yil"] or 0)}</span>'
                     '</div>',
                     unsafe_allow_html=True,
                 )
