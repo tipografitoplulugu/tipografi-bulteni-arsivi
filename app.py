@@ -1136,7 +1136,7 @@ button[data-copied="true"] {{ background: {theme['success_bg']}; border-color: {
 </head>
 <body>
 <button id="copyCitation" type="button" data-copy="{safe_value}"
-        aria-label="APA 7 alıntısını panoya kopyala" aria-live="polite">Kopyala</button>
+        aria-label="Alıntıyı panoya kopyala" aria-live="polite">Kopyala</button>
 <script>
 const button = document.getElementById("copyCitation");
 function fallbackCopy(text) {{
@@ -1162,15 +1162,15 @@ button.addEventListener("click", async () => {{
     }}
     button.textContent = "Kopyalandı";
     button.dataset.copied = "true";
-    button.setAttribute("aria-label", "APA 7 alıntısı kopyalandı");
+    button.setAttribute("aria-label", "Alıntı kopyalandı");
   }} catch (error) {{
     button.textContent = "Kopyalanamadı";
-    button.setAttribute("aria-label", "APA 7 alıntısı kopyalanamadı");
+    button.setAttribute("aria-label", "Alıntı kopyalanamadı");
   }}
   window.setTimeout(() => {{
     button.textContent = "Kopyala";
     delete button.dataset.copied;
-    button.setAttribute("aria-label", "APA 7 alıntısını panoya kopyala");
+    button.setAttribute("aria-label", "Alıntıyı panoya kopyala");
   }}, 1600);
 }});
 </script>
@@ -1414,7 +1414,7 @@ if query:
                     f"Türkçe Tipografi Topluluğu. ({int(row['yil'] or 0)}, "
                     f"{row['ay'] or ''}). {title}. Tipografi Bülteni. {issue_url}"
                 )
-                with st.expander("APA 7 alıntısı", expanded=False):
+                with st.expander("Alıntı yap", expanded=False):
                     citation_col, copy_col = st.columns(
                         [8, 1.15], vertical_alignment="center"
                     )
