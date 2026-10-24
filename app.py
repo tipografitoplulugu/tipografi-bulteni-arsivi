@@ -1161,7 +1161,7 @@ else:
             with st.container(border=True):
                 st.markdown(
                     '<div class="result-meta">'
-                    f'<strong>{html.escape(clean_issue)}</strong>'
+                    f'<strong>{html.escape(clean_issue.upper())}</strong>'
                     '</div>',
                     unsafe_allow_html=True,
                 )
