@@ -37,7 +37,6 @@ st.markdown(
         color: var(--ink);
         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     }
-    [data-testid="stHeader"] { background: transparent; }
     /* Hide Streamlit's in-app toolbar actions (Share, menu, and adjacent
        controls). The content links below are also left-aligned so they stay
        clear if the host renders its own toolbar outside the app. */
@@ -68,13 +67,11 @@ st.markdown(
     .brand-header {
         display: flex;
         align-items: center;
-        justify-content: space-between;
         justify-content: flex-start;
         gap: 1rem;
         padding-bottom: .6rem;
     }
     .brand-identity { display: flex; align-items: center; gap: .8rem; }
-    .brand-links { color: var(--muted); font-size: .88rem; white-space: nowrap; }
     .brand-links {
         margin-left: 1rem;
         color: var(--muted);
@@ -283,7 +280,6 @@ st.markdown(
         [data-testid="stHeadingWithActionElements"] h1 { font-size: clamp(2.45rem, 11vw, 3.6rem) !important; }
         .hero-copy { font-size: 1rem; }
         .brand-header { align-items: flex-start; flex-direction: column; }
-        .brand-links { white-space: normal; }
         .brand-links { margin-left: 0; white-space: normal; }
         .result-meta { flex-direction: column; gap: .2rem; }
         [data-testid="stHorizontalBlock"] { flex-wrap: wrap; gap: .55rem; }
@@ -693,7 +689,6 @@ st.markdown(
 )
 
 st.markdown('<hr class="hero-rule">', unsafe_allow_html=True)
-st.markdown('<div class="hero-eyebrow">Yayın arşivi · 2019—2026</div>', unsafe_allow_html=True)
 st.title("Tipografi Bülteni Arşivi")
 st.markdown(
     '<div class="hero-copy">Tipografi kültürüne dair haberleri, yazı tasarımını '
@@ -846,7 +841,6 @@ else:
                 st.markdown(
                     '<div class="result-meta">'
                     f'<strong>{html.escape(clean_issue)}</strong>'
-                    f'<span>{html.escape(str(row["ay"] or ""))} {int(row["yil"] or 0)}</span>'
                     '</div>',
                     unsafe_allow_html=True,
                 )
