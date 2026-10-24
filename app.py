@@ -82,11 +82,35 @@ st.markdown(
     .hero-rule { border: 0; border-top: 1px solid var(--line); margin: 1.8rem 0 1.5rem; }
     .stat-label { color: var(--muted); font-size: .75rem; letter-spacing: .04em; text-transform: uppercase; }
     .stat-value { margin-top: .25rem; color: var(--ink); font: 1.45rem Georgia, serif; letter-spacing: -.03em; }
-    [data-testid="stTextInput"] input, [data-testid="stSelectbox"] [role="combobox"] {
-        min-height: 48px; border: 1px solid #d8d5ce; border-radius: 12px;
-        background: var(--surface); color: var(--ink); font-size: .98rem;
+    [data-testid="stTextInput"] input,
+    [data-testid="stSelectbox"] [role="combobox"],
+    [data-testid="stFormSubmitButton"] button {
+        box-sizing: border-box !important;
+        height: 48px !important;
+        min-height: 48px !important;
+        max-height: 48px !important;
+        border-radius: 12px !important;
+        font-size: .98rem;
+        line-height: 1.2;
     }
-    [data-testid="stTextInput"] input:focus, [data-testid="stSelectbox"] [role="combobox"]:focus {
+    [data-testid="stTextInput"] input,
+    [data-testid="stSelectbox"] [role="combobox"] {
+        border: 1px solid #d8d5ce !important;
+        background: var(--surface) !important;
+        color: var(--ink) !important;
+    }
+    [data-testid="stSelectbox"] [data-baseweb="select"] > div,
+    [data-testid="stSelectbox"] [data-baseweb="select"] > div > div,
+    [data-testid="stSelectbox"] [data-baseweb="select"] > div > div > div {
+        background-color: var(--surface) !important;
+        background-image: none !important;
+    }
+    [data-testid="stSelectbox"] [data-baseweb="select"] svg {
+        color: var(--muted) !important;
+        fill: var(--muted) !important;
+    }
+    [data-testid="stTextInput"] input:focus,
+    [data-testid="stSelectbox"] [role="combobox"]:focus {
         border-color: var(--focus); box-shadow: 0 0 0 3px rgba(129, 81, 62, .15);
     }
     [data-testid="stForm"] { border: 0; padding: 0; }
@@ -96,13 +120,20 @@ st.markdown(
     }
     [data-testid="stButton"] button:hover { border-color: #b8a99e; background: #f2efeb; color: var(--ink); }
     [data-testid="stFormSubmitButton"] button {
-        min-height: 48px; border: 1px solid var(--ink); border-radius: 12px;
-        background: var(--ink); color: white; font-weight: 600;
+        border: 1px solid var(--ink) !important;
+        background: var(--ink) !important;
+        color: white !important;
+        font-weight: 600;
+        padding: 0 1rem !important;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
     [data-testid="stFormSubmitButton"] button p,
     [data-testid="stFormSubmitButton"] button span {
         color: #fff !important;
         margin: 0;
+        line-height: 1.2;
     }
     [data-testid="stFormSubmitButton"] button:hover { border-color: #393733; background: #393733; color: white; }
     button:focus-visible, a:focus-visible, input:focus-visible, [role="combobox"]:focus-visible, summary:focus-visible {
