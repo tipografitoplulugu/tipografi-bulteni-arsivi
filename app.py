@@ -8,7 +8,9 @@ from typing import Optional
 
 import pandas as pd
 import streamlit as st
+import streamlit.components.v1 as components
 
+LOGO_URL = "https://raw.githubusercontent.com/tipografitoplulugu/tipografi-bulteni-arsivi/main/logo.png"
 
 st.set_page_config(
     page_title="Tipografi Bülteni Arşivi",
@@ -53,9 +55,9 @@ st.markdown(
     p { line-height: 1.7; }
     a, [data-testid="stMarkdownContainer"] a { color: var(--accent) !important; text-underline-offset: 3px; }
     a:hover { color: #543426 !important; }
-    .brand-monogram {
-        display: grid; width: 42px; height: 42px; place-items: center;
-        border-radius: 11px; background: var(--ink); color: white; font: 600 1.25rem Georgia, serif;
+    .brand-logo {
+        display: block; flex: 0 0 48px; width: 48px; height: 48px;
+        border-radius: 11px; background: var(--ink); object-fit: cover;
     }
     .brand-header {
         display: flex;
@@ -66,8 +68,7 @@ st.markdown(
     }
     .brand-identity { display: flex; align-items: center; gap: .8rem; }
     .brand-links { color: var(--muted); font-size: .88rem; white-space: nowrap; }
-    .brand-name { font-size: .88rem; font-weight: 650; letter-spacing: .01em; }
-    .brand-subtitle { margin-top: .12rem; color: var(--muted); font-size: .76rem; }
+    .brand-name { font-size: 1.08rem; font-weight: 650; letter-spacing: .01em; }
     .hero-eyebrow, .section-eyebrow {
         color: var(--accent); font-size: .72rem; font-weight: 700;
         letter-spacing: .13em; text-transform: uppercase;
@@ -584,6 +585,72 @@ def choose_topic(topic: str) -> None:
     st.session_state["archive_page"] = 1
 
 
+def copy_button_markup(value: str) -> str:
+    """Build a compact, accessible clipboard button for an APA citation."""
+    safe_value = html.escape(value, quote=True)
+    return f"""<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<style>
+* {{ box-sizing: border-box; }}
+html, body {{ margin: 0; padding: 0; background: transparent; overflow: hidden; }}
+button {{
+  display: block; width: 100%; height: 48px; padding: 0 .8rem;
+  border: 1px solid #1d1c1a; border-radius: 10px;
+  background: #1d1c1a; color: #fff;
+  font: 600 .88rem/1.2 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  cursor: pointer; transition: background-color 120ms ease, border-color 120ms ease;
+}}
+button:hover {{ background: #393733; border-color: #393733; }}
+button:focus-visible {{ outline: 3px solid rgba(129, 81, 62, .55); outline-offset: 2px; }}
+button[data-copied="true"] {{ background: #52634b; border-color: #52634b; }}
+</style>
+</head>
+<body>
+<button id="copyCitation" type="button" data-copy="{safe_value}"
+        aria-label="APA 7 alıntısını panoya kopyala" aria-live="polite">Kopyala</button>
+<script>
+const button = document.getElementById("copyCitation");
+function fallbackCopy(text) {{
+  const field = document.createElement("textarea");
+  field.value = text;
+  field.setAttribute("readonly", "");
+  field.style.position = "fixed";
+  field.style.opacity = "0";
+  document.body.appendChild(field);
+  field.select();
+  const copied = document.execCommand("copy");
+  field.remove();
+  return copied;
+}}
+button.addEventListener("click", async () => {{
+  const text = button.dataset.copy;
+  try {{
+    if (navigator.clipboard && window.isSecureContext) {{
+      try {{ await navigator.clipboard.writeText(text); }}
+      catch (error) {{ if (!fallbackCopy(text)) throw error; }}
+    }} else if (!fallbackCopy(text)) {{
+      throw new Error("Clipboard unavailable");
+    }}
+    button.textContent = "Kopyalandı";
+    button.dataset.copied = "true";
+    button.setAttribute("aria-label", "APA 7 alıntısı kopyalandı");
+  }} catch (error) {{
+    button.textContent = "Kopyalanamadı";
+    button.setAttribute("aria-label", "APA 7 alıntısı kopyalanamadı");
+  }}
+  window.setTimeout(() => {{
+    button.textContent = "Kopyala";
+    delete button.dataset.copied;
+    button.setAttribute("aria-label", "APA 7 alıntısını panoya kopyala");
+  }}, 1600);
+}});
+</script>
+</body>
+</html>"""
+
+
 db_path = find_database()
 if db_path is None:
     st.error(
@@ -603,9 +670,9 @@ except (sqlite3.Error, OSError) as error:
 
 st.markdown(
     '<div class="brand-header"><div class="brand-identity">'
-    '<div class="brand-monogram">T</div><div><div class="brand-name">'
-    'Türkçe Tipografi Topluluğu</div><div class="brand-subtitle">'
-    'Aylık yayın arşivi · 2019’dan bugüne</div></div></div>'
+    f'<img class="brand-logo" src="{LOGO_URL}" '
+    'alt="Türkçe Tipografi Topluluğu logosu">'
+    '<div><div class="brand-name">Türkçe Tipografi Topluluğu</div></div></div>'
     '<div class="brand-links"><a href="https://tipografi.substack.com/">Substack</a>'
     '　·　<a href="https://medium.com/tipografi">Medium</a></div></div>',
     unsafe_allow_html=True,
@@ -786,10 +853,18 @@ else:
                     f"{row['ay'] or ''}). {title}. Tipografi Bülteni. {issue_url}"
                 )
                 with st.expander("APA 7 alıntısı", expanded=False):
-                    st.markdown(
-                        f'<div class="citation-box">{html.escape(citation)}</div>',
-                        unsafe_allow_html=True,
+                    citation_col, copy_col = st.columns(
+                        [8, 1.15], vertical_alignment="center"
                     )
+                    with citation_col:
+                        st.markdown(
+                            f'<div class="citation-box">{html.escape(citation)}</div>',
+                            unsafe_allow_html=True,
+                        )
+                    with copy_col:
+                        components.html(
+                            copy_button_markup(citation), height=52, scrolling=False
+                        )
 
         if page_count > 1:
             st.markdown("")
