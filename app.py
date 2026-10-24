@@ -1010,8 +1010,8 @@ st.title("Tipografi Bülteni Arşivi")
 st.markdown(
     '<div class="hero-copy">Türkiye’de ve dünyada tipografi ve yazı tasarımı alanında '
     'yaşanan gelişmeleri, haberleri ve öne çıkan üretimleri bir araya getiriyoruz. '
-    '2019’dan bu yana aylık olarak yayımlanan bültenlerimizin tamamına arşivden '
-    'ulaşabilir, yeni sayılar eklendikçe büyüyen bu keşfe siz de katılabilirsiniz.</div>',
+    '2019’dan bu yana aylık olarak yayımlanan bültenlerin arşivdinde anahtar kelime ile arama yapabilir, '
+    'yeni sayılar eklendikçe büyüyen bu keşfe siz de katılabilirsiniz.</div>',
     unsafe_allow_html=True,
 )
 
