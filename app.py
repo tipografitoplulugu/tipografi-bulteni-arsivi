@@ -425,7 +425,8 @@ st.markdown(
         stroke-linejoin: round;
         stroke-width: 2;
     }
-    [data-testid="stTextInput"] label {
+    [data-testid="stTextInput"] label,
+    [data-testid="stSelectbox"] label {
         display: none !important;
     }
     [data-testid="stTextInput"] input,
@@ -1210,20 +1211,24 @@ st.markdown(
 )
 
 st.markdown('<hr class="hero-rule">', unsafe_allow_html=True)
-st.markdown('<div class="section-eyebrow">ARŞİVDE ARA</div>', unsafe_allow_html=True)
 
 with st.form("archive_search"):
     search_col, year_col, submit_col = st.columns(
         [5, 1.6, 1.05], vertical_alignment="bottom"
     )
     with search_col:
+        st.markdown('<div class="section-eyebrow">ARŞİVDE ARA</div>', unsafe_allow_html=True)
         st.text_input(
             "Aranacak ifade", key="archive_query",
             placeholder="Örn. değişken yazıtipi, Monotype, kaligrafi",
             label_visibility="collapsed",
         )
     with year_col:
-        st.selectbox("Yıl", [ALL_YEARS, *available_years], key="archive_year")
+        st.markdown('<div class="section-eyebrow">YIL</div>', unsafe_allow_html=True)
+        st.selectbox(
+            "Yıl", [ALL_YEARS, *available_years],
+            key="archive_year", label_visibility="collapsed",
+        )
     with submit_col:
         search_submitted = st.form_submit_button("Ara", type="primary", use_container_width=True)
 
