@@ -94,14 +94,6 @@ elif "archive_theme" not in st.session_state:
     st.session_state["archive_theme"] = "light"
 
 
-def toggle_archive_theme() -> None:
-    next_theme = (
-        "light" if st.session_state.get("archive_theme") == "dark" else "dark"
-    )
-    st.session_state["archive_theme"] = next_theme
-    st.query_params["theme"] = next_theme
-
-
 CURRENT_THEME_NAME = st.session_state.get("archive_theme", "light")
 CURRENT_THEME = COLOR_THEMES.get(CURRENT_THEME_NAME, COLOR_THEMES["light"])
 THEME_CSS_VARIABLES = "\n".join(
@@ -133,18 +125,22 @@ THEME_BOOTSTRAP = f"""
   try {{ parentWindow.localStorage.setItem(key, serverTheme); }} catch (error) {{}}
   parentWindow.__archiveThemeCurrent = serverTheme;
   const syncToggle = () => {{
-    const button = parentWindow.document.querySelector(".st-key-archive_theme_toggle button");
+    const button = parentWindow.document.querySelector(".archive-theme-toggle");
     if (!button) return;
     const current = parentWindow.__archiveThemeCurrent || serverTheme;
     button.setAttribute("aria-label", current === "dark" ? "Açık moda geç" : "Koyu moda geç");
     button.setAttribute("title", current === "dark" ? "Açık moda geç" : "Koyu moda geç");
     if (button.dataset.archiveThemeBound !== "true") {{
       button.dataset.archiveThemeBound = "true";
-      button.addEventListener("click", () => {{
+      button.addEventListener("click", event => {{
+        event.preventDefault();
         const activeTheme = parentWindow.__archiveThemeCurrent || serverTheme;
         const nextTheme = activeTheme === "dark" ? "light" : "dark";
         parentWindow.__archiveThemeCurrent = nextTheme;
         try {{ parentWindow.localStorage.setItem(key, nextTheme); }} catch (error) {{}}
+        const nextUrl = new URL(parentWindow.location.href);
+        nextUrl.searchParams.set("theme", nextTheme);
+        parentWindow.location.assign(nextUrl.href);
       }});
     }}
   }};
@@ -203,24 +199,36 @@ st.markdown(
         display: flex;
         align-items: center;
         justify-content: flex-start;
+        flex: 1 1 auto;
+        min-width: 0;
+        gap: .5rem;
         color: var(--muted);
         font-size: .88rem;
         white-space: nowrap;
     }
     .brand-name { font-size: 1.08rem; font-weight: 650; letter-spacing: .01em; }
-    .st-key-archive-brand-row [data-testid="stHorizontalBlock"] { align-items: center; gap: .6rem; }
-    .st-key-archive-brand-row [data-testid="column"] { min-width: 0 !important; }
-    [data-testid="stElementContainer"][class*="st-key-archive_theme_toggle"] [data-testid="stButton"] button {
-        width: 40px !important; min-width: 40px !important;
-        height: 40px !important; min-height: 40px !important;
-        padding: 0 !important; border-radius: 999px !important;
-        border-color: var(--line) !important; background: var(--surface) !important;
-        color: var(--link) !important; font-size: 1.15rem !important; line-height: 1 !important;
+    .archive-brand-header {
+        display: flex; align-items: center; justify-content: space-between;
+        gap: 1.25rem; min-width: 0;
     }
-    [data-testid="stElementContainer"][class*="st-key-archive_theme_toggle"] [data-testid="stButton"] button:hover {
-        border-color: var(--accent) !important;
-        background: var(--accent-soft) !important;
-        color: var(--link-hover) !important;
+    .archive-brand-actions {
+        display: flex; align-items: center; justify-content: flex-end;
+        gap: 1rem; margin-left: auto; min-width: 0;
+    }
+    .archive-theme-toggle {
+        appearance: none !important; -webkit-appearance: none !important;
+        display: grid; place-items: center; flex: 0 0 40px;
+        width: 40px; height: 40px; padding: 0;
+        border: 0; border-radius: 50%;
+        background: transparent; color: var(--link);
+        box-shadow: none !important; cursor: pointer;
+    }
+    .archive-theme-toggle:hover {
+        background: transparent; color: var(--link-hover);
+    }
+    .archive-theme-toggle svg { display: block; width: 19px; height: 19px; }
+    .archive-theme-toggle:focus-visible {
+        outline: 2px solid var(--focus); outline-offset: 3px;
     }
     .hero-eyebrow, .section-eyebrow {
         color: var(--link); font-size: .72rem; font-weight: 700;
@@ -562,26 +570,8 @@ st.markdown(
         [data-testid="stMain"] .block-container { padding: 1.15rem 1rem 3rem; }
         [data-testid="stHeadingWithActionElements"] h1 { font-size: clamp(2.45rem, 11vw, 3.6rem) !important; }
         .hero-copy { font-size: 1rem; }
-        .st-key-archive-brand-row [data-testid="stHorizontalBlock"] {
-            display: grid !important;
-            grid-template-columns: minmax(0, 1fr) 44px;
-            column-gap: .65rem;
-            row-gap: .5rem;
-        }
-        .st-key-archive-brand-row [data-testid="stHorizontalBlock"] > [data-testid="column"] {
-            width: auto !important;
-            min-width: 0 !important;
-            flex: none !important;
-        }
-        .st-key-archive-brand-row [data-testid="column"]:nth-child(1) { grid-column: 1 / -1; }
-        .st-key-archive-brand-row [data-testid="column"]:nth-child(2) { grid-column: 1; grid-row: 2; }
-        .st-key-archive-brand-row [data-testid="column"]:nth-child(3) {
-            grid-column: 2;
-            grid-row: 2;
-            display: flex;
-            justify-content: flex-end;
-            align-items: center;
-        }
+        .archive-brand-header { align-items: flex-start; flex-direction: column; gap: .75rem; }
+        .archive-brand-actions { width: 100%; justify-content: space-between; gap: .75rem; margin-left: 0; }
         .brand-links { white-space: nowrap; }
         .footer-content { align-items: flex-start; flex-direction: column; }
         .footer-actions { justify-content: flex-start; }
@@ -1011,31 +1001,32 @@ except (sqlite3.Error, OSError) as error:
     st.stop()
 
 
-with st.container(key="archive_brand_row"):
-    brand_col, links_col, theme_col = st.columns([5.5, 2.1, .55], vertical_alignment="center")
-    with brand_col:
-        st.markdown(
-            '<div class="brand-identity">'
-            f'<img class="brand-logo" src="{LOGO_URL}" '
-            'alt="Türkçe Tipografi Topluluğu logosu">'
-            '<div><div class="brand-name">Türkçe Tipografi Topluluğu</div></div></div>',
-            unsafe_allow_html=True,
-        )
-    with links_col:
-        st.markdown(
-            '<div class="brand-links"><a href="https://tipografi.substack.com/">Substack</a>'
-            '　·　<a href="https://medium.com/tipografi">Medium</a></div>',
-            unsafe_allow_html=True,
-        )
-    with theme_col:
-        is_dark = st.session_state.get("archive_theme") == "dark"
-        st.button(
-            "☀" if is_dark else "☾",
-            key="archive_theme_toggle",
-            help="Açık temaya geç" if is_dark else "Koyu temaya geç",
-            on_click=toggle_archive_theme,
-            type="secondary",
-        )
+is_dark = CURRENT_THEME_NAME == "dark"
+theme_icon = (
+    '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false">'
+    '<circle cx="12" cy="12" r="3.5" stroke="currentColor" stroke-width="1.7"/>'
+    '<path d="M12 2.5v2M12 19.5v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2.5 12h2m15 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42" '
+    'stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>'
+    if is_dark
+    else '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false">'
+    '<path d="M20.1 15.2A8.4 8.4 0 0 1 8.8 3.9 8.5 8.5 0 1 0 20.1 15.2Z" '
+    'stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+)
+theme_label = "Açık moda geç" if is_dark else "Koyu moda geç"
+st.markdown(
+    f'<header class="archive-brand-header">'
+    f'<div class="brand-identity"><img class="brand-logo" src="{LOGO_URL}" '
+    'alt="Türkçe Tipografi Topluluğu logosu">'
+    '<div><div class="brand-name">Türkçe Tipografi Topluluğu</div></div></div>'
+    '<div class="archive-brand-actions">'
+    '<nav class="brand-links" aria-label="Yayın bağlantıları">'
+    '<a href="https://tipografi.substack.com/">Substack</a>'
+    '<span aria-hidden="true">·</span>'
+    '<a href="https://medium.com/tipografi">Medium</a></nav>'
+    f'<button class="archive-theme-toggle" type="button" aria-label="{html.escape(theme_label)}" '
+    f'title="{html.escape(theme_label)}">{theme_icon}</button></div></header>',
+    unsafe_allow_html=True,
+)
 
 st.markdown('<hr class="hero-rule">', unsafe_allow_html=True)
 st.title("Tipografi Bülteni Arşivi")
