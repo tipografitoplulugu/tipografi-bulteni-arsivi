@@ -711,7 +711,7 @@ for column, label, value in zip(
         )
 
 st.markdown('<hr class="hero-rule">', unsafe_allow_html=True)
-st.markdown('<div class="section-eyebrow">Arşivde ara</div>', unsafe_allow_html=True)
+st.markdown('<div class="section-eyebrow">ARŞİVDE ARA</div>', unsafe_allow_html=True)
 
 with st.form("archive_search"):
     search_col, year_col, submit_col = st.columns(
