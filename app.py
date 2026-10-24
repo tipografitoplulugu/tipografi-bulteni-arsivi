@@ -5,6 +5,7 @@ import sqlite3
 import unicodedata
 from pathlib import Path
 from typing import Optional
+from urllib.parse import quote
 
 import pandas as pd
 import streamlit as st
@@ -94,13 +95,35 @@ elif "archive_theme" not in st.session_state:
     st.session_state["archive_theme"] = "light"
 
 
+def toggle_archive_theme() -> None:
+    next_theme = "light" if st.session_state.get("archive_theme") == "dark" else "dark"
+    st.session_state["archive_theme"] = next_theme
+    st.query_params["theme"] = next_theme
+
+
 CURRENT_THEME_NAME = st.session_state.get("archive_theme", "light")
 CURRENT_THEME = COLOR_THEMES.get(CURRENT_THEME_NAME, COLOR_THEMES["light"])
+SUN_ICON_SVG = (
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">'
+    '<g fill="none" stroke="#000" stroke-linecap="round" stroke-width="1.8">'
+    '<circle cx="12" cy="12" r="3.5"/>'
+    '<path d="M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"/>'
+    '</g></svg>'
+)
+MOON_ICON_SVG = (
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">'
+    '<path d="M20.1 15.2A8.4 8.4 0 0 1 8.8 3.9 8.5 8.5 0 1 0 20.1 15.2Z" '
+    'fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"/>'
+    '</svg>'
+)
+ICON_FOR_NEXT_THEME = (SUN_ICON_SVG if CURRENT_THEME_NAME == "dark" else MOON_ICON_SVG).replace(
+    "#000", CURRENT_THEME["link"]
+)
 THEME_CSS_VARIABLES = "\n".join(
     f"--{key.replace('_', '-')}: {value};"
     for key, value in CURRENT_THEME.items()
     if key != "scheme"
-)
+) + f"\n--theme-icon-image: url('data:image/svg+xml,{quote(ICON_FOR_NEXT_THEME, safe='')}');"
 THEME_BOOTSTRAP = f"""
 <script>
 (() => {{
@@ -125,22 +148,20 @@ THEME_BOOTSTRAP = f"""
   try {{ parentWindow.localStorage.setItem(key, serverTheme); }} catch (error) {{}}
   parentWindow.__archiveThemeCurrent = serverTheme;
   const syncToggle = () => {{
-    const button = parentWindow.document.querySelector(".archive-theme-toggle");
+    const button = parentWindow.document.querySelector(".st-key-archive_theme_toggle button");
     if (!button) return;
     const current = parentWindow.__archiveThemeCurrent || serverTheme;
     button.setAttribute("aria-label", current === "dark" ? "Açık moda geç" : "Koyu moda geç");
     button.setAttribute("title", current === "dark" ? "Açık moda geç" : "Koyu moda geç");
     if (button.dataset.archiveThemeBound !== "true") {{
       button.dataset.archiveThemeBound = "true";
-      button.addEventListener("click", event => {{
-        event.preventDefault();
+      button.addEventListener("click", () => {{
         const activeTheme = parentWindow.__archiveThemeCurrent || serverTheme;
         const nextTheme = activeTheme === "dark" ? "light" : "dark";
         parentWindow.__archiveThemeCurrent = nextTheme;
+        button.setAttribute("aria-label", nextTheme === "dark" ? "Açık moda geç" : "Koyu moda geç");
+        button.setAttribute("title", nextTheme === "dark" ? "Açık moda geç" : "Koyu moda geç");
         try {{ parentWindow.localStorage.setItem(key, nextTheme); }} catch (error) {{}}
-        const nextUrl = new URL(parentWindow.location.href);
-        nextUrl.searchParams.set("theme", nextTheme);
-        parentWindow.location.assign(nextUrl.href);
       }});
     }}
   }};
@@ -209,26 +230,30 @@ st.markdown(
     .brand-name { font-size: 1.08rem; font-weight: 650; letter-spacing: .01em; }
     .archive-brand-header {
         display: flex; align-items: center; justify-content: space-between;
-        gap: 1.25rem; min-width: 0;
+        gap: 1.25rem; min-width: 0; min-height: 48px; padding-right: 48px;
     }
-    .archive-brand-actions {
-        display: flex; align-items: center; justify-content: flex-end;
-        gap: 1rem; margin-left: auto; min-width: 0;
+    .st-key-archive_brand_row { position: relative !important; min-height: 48px; }
+    .st-key-archive_theme_toggle {
+        position: absolute !important; top: 4px; right: 0;
+        width: 40px !important; height: 40px !important;
+        margin: 0 !important; padding: 0 !important; z-index: 2;
     }
-    .archive-theme-toggle {
+    .st-key-archive_theme_toggle [data-testid="stButton"] button {
+        position: relative !important;
+        display: grid !important; place-items: center !important;
+        width: 40px !important; min-width: 40px !important;
+        height: 40px !important; min-height: 40px !important; max-height: 40px !important;
+        padding: 0 !important; border: 0 !important; border-radius: 50% !important;
+        background: transparent !important; color: transparent !important;
+        font-size: 0 !important; line-height: 0 !important; box-shadow: none !important;
         appearance: none !important; -webkit-appearance: none !important;
-        display: grid; place-items: center; flex: 0 0 40px;
-        width: 40px; height: 40px; padding: 0;
-        border: 0; border-radius: 50%;
-        background: transparent; color: var(--link);
-        box-shadow: none !important; cursor: pointer;
     }
-    .archive-theme-toggle:hover {
-        background: transparent; color: var(--link-hover);
+    .st-key-archive_theme_toggle [data-testid="stButton"] button p {
+        margin: 0 !important; font-size: 0 !important; line-height: 0 !important;
     }
-    .archive-theme-toggle svg { display: block; width: 19px; height: 19px; }
-    .archive-theme-toggle:focus-visible {
-        outline: 2px solid var(--focus); outline-offset: 3px;
+    .st-key-archive_theme_toggle [data-testid="stButton"] button::before {
+        content: ""; position: absolute; width: 20px; height: 20px;
+        background: var(--theme-icon-image) center / contain no-repeat;
     }
     .hero-eyebrow, .section-eyebrow {
         color: var(--link); font-size: .72rem; font-weight: 700;
@@ -364,10 +389,9 @@ st.markdown(
     }
     [data-testid="stTextInputRootElement"]:focus-within,
     [data-testid="stSelectbox"] [role="group"]:focus-within {
-        border-color: var(--focus) !important;
+        border: 2px solid var(--focus) !important;
         box-shadow: none !important;
-        outline: 2px solid var(--focus) !important;
-        outline-offset: 2px !important;
+        outline: none !important;
     }
     [data-testid="stSelectbox"] [data-baseweb="select"] > div,
     [data-testid="stSelectbox"] [data-baseweb="select"] > div > div,
@@ -496,11 +520,17 @@ st.markdown(
     }
     [data-testid="stSpinner"] svg { color: var(--accent) !important; }
     [data-testid="stSpinner"] circle { stroke: var(--accent) !important; }
-    button:focus-visible, a:focus-visible, summary:focus-visible {
-        outline: 2px solid var(--focus) !important; outline-offset: 2px !important;
+    [data-testid="stButton"] button:focus-visible,
+    [data-testid="stFormSubmitButton"] button:focus-visible,
+    .archive-theme-toggle:focus-visible {
+        border: 2px solid var(--focus) !important;
+        outline: none !important;
+        box-shadow: none !important;
     }
+    a:focus-visible { outline: 2px solid var(--focus) !important; outline-offset: 2px !important; }
     [data-testid="stVerticalBlockBorderWrapper"] {
-        border: 1px solid var(--line) !important; border-radius: 16px !important; background: var(--surface) !important;
+        border: 1px solid var(--line) !important; border-radius: 16px !important;
+        background: var(--surface) !important; box-shadow: none !important;
     }
     .result-meta {
         display: flex; flex-wrap: wrap; justify-content: space-between; gap: .35rem 1rem;
@@ -510,9 +540,10 @@ st.markdown(
     .result-excerpt { margin: .2rem 0 .8rem; color: var(--muted); font-size: .96rem; line-height: 1.72; }
     mark.search-hit { border-radius: 3px; background: var(--accent-soft); color: var(--accent-soft-ink); padding: 0 .12em; }
     [data-testid="stExpander"] {
-        border: 1px solid var(--line) !important;
+        border: 1px solid var(--line-strong) !important;
         border-radius: 12px !important;
         background: var(--paper) !important;
+        box-shadow: none !important;
         overflow: hidden;
     }
     [data-testid="stExpander"] details,
@@ -520,7 +551,15 @@ st.markdown(
     [data-testid="stExpander"] details > summary {
         background: var(--surface) !important;
         background-image: none !important;
+        border: 0 !important;
+        box-shadow: none !important;
     }
+    [data-testid="stExpander"] details { border: 0 !important; outline: none !important; box-shadow: none !important; }
+    [data-testid="stExpander"]:focus-within {
+        border: 2px solid var(--focus) !important;
+        box-shadow: none !important;
+    }
+    [data-testid="stExpander"] summary:focus-visible { outline: none !important; }
     [data-testid="stExpander"] summary,
     [data-testid="stExpander"] summary p {
         color: var(--ink) !important;
@@ -570,9 +609,10 @@ st.markdown(
         [data-testid="stMain"] .block-container { padding: 1.15rem 1rem 3rem; }
         [data-testid="stHeadingWithActionElements"] h1 { font-size: clamp(2.45rem, 11vw, 3.6rem) !important; }
         .hero-copy { font-size: 1rem; }
-        .archive-brand-header { align-items: flex-start; flex-direction: column; gap: .75rem; }
-        .archive-brand-actions { width: 100%; justify-content: space-between; gap: .75rem; margin-left: 0; }
-        .brand-links { white-space: nowrap; }
+        .st-key-archive_brand_row { min-height: 100px; }
+        .st-key-archive_theme_toggle { top: 55px; }
+        .archive-brand-header { align-items: flex-start; flex-direction: column; gap: .65rem; padding-right: 0; }
+        .brand-links { width: calc(100% - 48px); white-space: nowrap; }
         .footer-content { align-items: flex-start; flex-direction: column; }
         .footer-actions { justify-content: flex-start; }
         .footer-social { justify-content: flex-start; gap: .8rem; }
@@ -1001,32 +1041,26 @@ except (sqlite3.Error, OSError) as error:
     st.stop()
 
 
-is_dark = CURRENT_THEME_NAME == "dark"
-theme_icon = (
-    '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false">'
-    '<circle cx="12" cy="12" r="3.5" stroke="currentColor" stroke-width="1.7"/>'
-    '<path d="M12 2.5v2M12 19.5v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2.5 12h2m15 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42" '
-    'stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>'
-    if is_dark
-    else '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false">'
-    '<path d="M20.1 15.2A8.4 8.4 0 0 1 8.8 3.9 8.5 8.5 0 1 0 20.1 15.2Z" '
-    'stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>'
-)
-theme_label = "Açık moda geç" if is_dark else "Koyu moda geç"
-st.markdown(
-    f'<header class="archive-brand-header">'
-    f'<div class="brand-identity"><img class="brand-logo" src="{LOGO_URL}" '
-    'alt="Türkçe Tipografi Topluluğu logosu">'
-    '<div><div class="brand-name">Türkçe Tipografi Topluluğu</div></div></div>'
-    '<div class="archive-brand-actions">'
-    '<nav class="brand-links" aria-label="Yayın bağlantıları">'
-    '<a href="https://tipografi.substack.com/">Substack</a>'
-    '<span aria-hidden="true">·</span>'
-    '<a href="https://medium.com/tipografi">Medium</a></nav>'
-    f'<button class="archive-theme-toggle" type="button" aria-label="{html.escape(theme_label)}" '
-    f'title="{html.escape(theme_label)}">{theme_icon}</button></div></header>',
-    unsafe_allow_html=True,
-)
+with st.container(key="archive_brand_row"):
+    st.markdown(
+        f'<header class="archive-brand-header">'
+        f'<div class="brand-identity"><img class="brand-logo" src="{LOGO_URL}" '
+        'alt="Türkçe Tipografi Topluluğu logosu">'
+        '<div><div class="brand-name">Türkçe Tipografi Topluluğu</div></div></div>'
+        '<nav class="brand-links" aria-label="Yayın bağlantıları">'
+        '<a href="https://tipografi.substack.com/">Substack</a>'
+        '<span aria-hidden="true">·</span>'
+        '<a href="https://medium.com/tipografi">Medium</a></nav></header>',
+        unsafe_allow_html=True,
+    )
+    is_dark = CURRENT_THEME_NAME == "dark"
+    st.button(
+        " ",
+        key="archive_theme_toggle",
+        help="Açık moda geç" if is_dark else "Koyu moda geç",
+        on_click=toggle_archive_theme,
+        type="secondary",
+    )
 
 st.markdown('<hr class="hero-rule">', unsafe_allow_html=True)
 st.title("Tipografi Bülteni Arşivi")
