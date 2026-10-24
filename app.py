@@ -244,6 +244,16 @@ st.markdown(
         background: #fff; color: #393733; font-size: .83rem; transition: border-color 120ms ease, background 120ms ease;
     }
     [data-testid="stButton"] button:hover { border-color: #b8a99e; background: #f2efeb; color: var(--ink); }
+    [data-testid="stElementContainer"][class*="st-key-topic_"] [data-testid="stButton"] button {
+        opacity: .56;
+        transition: opacity 140ms ease, border-color 140ms ease, background 140ms ease;
+    }
+    [data-testid="stElementContainer"][class*="st-key-topic_"] [data-testid="stButton"] button:hover,
+    [data-testid="stElementContainer"][class*="st-key-topic_"] [data-testid="stButton"] button:focus,
+    [data-testid="stElementContainer"][class*="st-key-topic_"] [data-testid="stButton"] button:focus-visible,
+    [data-testid="stElementContainer"][class*="st-key-topic_"] [data-testid="stButton"] button:active {
+        opacity: 1;
+    }
     [data-testid="stFormSubmitButton"] button {
         border: 1px solid var(--ink) !important;
         background: var(--ink) !important;
