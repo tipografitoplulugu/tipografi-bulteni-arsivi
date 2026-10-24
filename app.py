@@ -1289,7 +1289,7 @@ st.markdown(
       <div class="footer-content">
         <div class="footer-name">Türkçe Tipografi Topluluğu</div>
         <div class="footer-actions">
-          <div class="footer-subscribe">Bültene <a href="https://tipografi.substack.com/" target="_blank" rel="noopener noreferrer">Abone Ol</a></div>
+          <div class="footer-subscribe"><a href="https://tipografi.substack.com/" target="_blank" rel="noopener noreferrer">Bültene Abone Ol</a></div>
           <nav class="footer-social" aria-label="Sosyal medya bağlantıları">
           <a href="https://www.facebook.com/tipografi/" target="_blank" rel="noopener noreferrer" aria-label="Facebook" title="Facebook">
             <svg viewBox="0 0 24 24" aria-hidden="true"><path class="icon-fill" d="M13.6 21v-8.2h2.8l.4-3.2h-3.2V7.5c0-.9.3-1.6 1.6-1.6H17V3.1c-.3 0-1.3-.1-2.4-.1-2.4 0-4.1 1.5-4.1 4.3v2.4H7.8v3.2h2.7V21z"/></svg>
