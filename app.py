@@ -171,6 +171,12 @@ THEME_BOOTSTRAP = f"""
     parentWindow.__archiveThemeObserver = new MutationObserver(syncToggle);
     parentWindow.__archiveThemeObserver.observe(parentWindow.document.body, {{ childList: true, subtree: true }});
   }}
+  if (!parentWindow.document.querySelector("link[href*='Instrument+Serif']")) {{
+    const linkFont = parentWindow.document.createElement("link");
+    linkFont.rel = "stylesheet";
+    linkFont.href = "https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap";
+    parentWindow.document.head.appendChild(linkFont);
+  }}
 }})();
 </script>
 """
@@ -183,6 +189,8 @@ st.markdown(
 st.markdown(
     """
     <style>
+    @import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap');
+
     html, body, [data-testid="stAppViewContainer"], [data-testid="stMain"] {
         background: var(--paper);
         color: var(--ink);
@@ -197,13 +205,14 @@ st.markdown(
     [data-testid="stMain"] .block-container { max-width: 1120px; padding: 2rem 2.25rem 5rem; }
     h1, h2, h3, h4 {
         color: var(--ink) !important;
-        font-family: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif !important;
-        letter-spacing: -0.035em !important;
+        font-family: "Instrument Serif", Georgia, serif !important;
+        font-weight: 400 !important;
+        letter-spacing: -0.02em !important;
     }
     [data-testid="stHeadingWithActionElements"] h1 {
         font-size: clamp(2.8rem, 6vw, 5.25rem) !important;
         line-height: 1.02 !important;
-        font-weight: 600 !important;
+        font-weight: 400 !important;
         margin: .4rem 0 .8rem !important;
     }
     [data-testid="stHeadingWithActionElements"] h2 { font-size: clamp(1.6rem, 3vw, 2.2rem) !important; }
@@ -284,8 +293,8 @@ st.markdown(
     }
     .stat-value {
         color: var(--ink);
-        font: 1.45rem/1.2 Georgia, serif;
-        letter-spacing: -.03em;
+        font: 1.55rem/1.2 "Instrument Serif", Georgia, serif;
+        letter-spacing: -.02em;
         overflow-wrap: anywhere;
     }
     .archive-footer {
