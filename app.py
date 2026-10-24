@@ -102,26 +102,18 @@ def toggle_archive_theme() -> None:
     st.query_params["theme"] = next_theme
 
 
-CURRENT_THEME = COLOR_THEMES.get(st.session_state.get("archive_theme", "light"), COLOR_THEMES["light"])
+CURRENT_THEME_NAME = st.session_state.get("archive_theme", "light")
+CURRENT_THEME = COLOR_THEMES.get(CURRENT_THEME_NAME, COLOR_THEMES["light"])
 THEME_CSS_VARIABLES = "\n".join(
     f"--{key.replace('_', '-')}: {value};"
     for key, value in CURRENT_THEME.items()
-    if key != "scheme"
-)
-LIGHT_CSS_VARIABLES = "\n".join(
-    f"--{key.replace('_', '-')}: {value};"
-    for key, value in COLOR_THEMES["light"].items()
-    if key != "scheme"
-)
-DARK_CSS_VARIABLES = "\n".join(
-    f"--{key.replace('_', '-')}: {value};"
-    for key, value in COLOR_THEMES["dark"].items()
     if key != "scheme"
 )
 THEME_BOOTSTRAP = f"""
 <script>
 (() => {{
   const key = {THEME_STORAGE_KEY!r};
+  const serverTheme = {CURRENT_THEME_NAME!r};
   const valid = value => value === "light" || value === "dark";
   const parentWindow = window.parent;
   const root = parentWindow.document.documentElement;
@@ -131,23 +123,32 @@ THEME_BOOTSTRAP = f"""
   try {{ savedTheme = parentWindow.localStorage.getItem(key); }} catch (error) {{}}
   const systemTheme = parentWindow.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
   const theme = valid(queryTheme) ? queryTheme : (valid(savedTheme) ? savedTheme : systemTheme);
-  root.dataset.archiveTheme = theme;
   root.style.colorScheme = theme;
-  try {{ parentWindow.localStorage.setItem(key, theme); }} catch (error) {{}}
   if (!valid(queryTheme)) {{
+    try {{ parentWindow.localStorage.setItem(key, theme); }} catch (error) {{}}
     url.searchParams.set("theme", theme);
     parentWindow.location.replace(url.href);
     return;
   }}
+  try {{ parentWindow.localStorage.setItem(key, serverTheme); }} catch (error) {{}}
+  parentWindow.__archiveThemeCurrent = serverTheme;
   const syncToggle = () => {{
     const button = parentWindow.document.querySelector(".st-key-archive_theme_toggle button");
     if (!button) return;
-    const current = root.dataset.archiveTheme;
+    const current = parentWindow.__archiveThemeCurrent || serverTheme;
     button.setAttribute("aria-label", current === "dark" ? "Açık moda geç" : "Koyu moda geç");
     button.setAttribute("title", current === "dark" ? "Açık moda geç" : "Koyu moda geç");
-    const icon = current === "dark" ? "☀" : "☾";
-    if (button.textContent.trim() !== icon) button.textContent = icon;
+    if (button.dataset.archiveThemeBound !== "true") {{
+      button.dataset.archiveThemeBound = "true";
+      button.addEventListener("click", () => {{
+        const activeTheme = parentWindow.__archiveThemeCurrent || serverTheme;
+        const nextTheme = activeTheme === "dark" ? "light" : "dark";
+        parentWindow.__archiveThemeCurrent = nextTheme;
+        try {{ parentWindow.localStorage.setItem(key, nextTheme); }} catch (error) {{}}
+      }});
+    }}
   }};
+  parentWindow.__archiveThemeCurrent = serverTheme;
   syncToggle();
   if (!parentWindow.__archiveThemeObserver) {{
     parentWindow.__archiveThemeObserver = new MutationObserver(syncToggle);
@@ -158,14 +159,7 @@ THEME_BOOTSTRAP = f"""
 """
 components.html(THEME_BOOTSTRAP, height=0, scrolling=False)
 st.markdown(
-    f"""<style>
-    :root {{ color-scheme: {CURRENT_THEME['scheme']}; {THEME_CSS_VARIABLES} }}
-    :root[data-archive-theme="light"] {{ color-scheme: light; {LIGHT_CSS_VARIABLES} }}
-    :root[data-archive-theme="dark"] {{ color-scheme: dark; {DARK_CSS_VARIABLES} }}
-    @media (prefers-color-scheme: dark) {{
-      :root:not([data-archive-theme]) {{ color-scheme: dark; {DARK_CSS_VARIABLES} }}
-    }}
-    </style>""",
+    f"<style>:root {{ color-scheme: {CURRENT_THEME['scheme']}; {THEME_CSS_VARIABLES} }}</style>",
     unsafe_allow_html=True,
 )
 
