@@ -320,9 +320,11 @@ st.markdown(
     }
     [data-testid="stTextInput"] input,
     [data-testid="stSelectbox"] [role="combobox"] {
-        border: 1px solid var(--line) !important;
+        border: 0 !important;
         background: var(--surface) !important;
         color: var(--ink) !important;
+        box-shadow: none !important;
+        appearance: none !important;
     }
     [data-testid="stTextInput"] input::placeholder,
     [data-testid="stTextInputRootElement"] input::placeholder {
@@ -339,6 +341,7 @@ st.markdown(
         border: 1px solid var(--line) !important;
         border-radius: 12px !important;
         background: var(--surface) !important;
+        box-shadow: none !important;
         overflow: hidden;
     }
     [data-testid="stTextInputRootElement"] [data-testid="stTextInputField"] {
@@ -354,13 +357,17 @@ st.markdown(
     [data-testid="stTextInputRootElement"]:focus-within,
     [data-testid="stSelectbox"] [role="group"]:focus-within {
         border-color: var(--focus) !important;
-        box-shadow: 0 0 0 3px var(--focus-ring) !important;
+        box-shadow: none !important;
+        outline: 2px solid var(--focus) !important;
+        outline-offset: 2px !important;
     }
     [data-testid="stSelectbox"] [data-baseweb="select"] > div,
     [data-testid="stSelectbox"] [data-baseweb="select"] > div > div,
     [data-testid="stSelectbox"] [data-baseweb="select"] > div > div > div {
         background-color: var(--surface) !important;
         background-image: none !important;
+        border: 0 !important;
+        box-shadow: none !important;
     }
     [data-testid="stSelectbox"] [data-baseweb="select"] svg {
         color: var(--muted) !important;
@@ -377,6 +384,7 @@ st.markdown(
         border: 1px solid var(--line) !important;
         border-radius: 12px !important;
         background: var(--surface) !important;
+        box-shadow: none !important;
         overflow: hidden;
     }
     [data-testid="stSelectbox"] [role="group"] [role="combobox"] {
@@ -418,8 +426,9 @@ st.markdown(
     }
     [data-testid="stTextInput"] input:focus,
     [data-testid="stSelectbox"] [role="combobox"]:focus {
-        border-color: var(--focus) !important;
-        box-shadow: 0 0 0 3px var(--focus-ring) !important;
+        border: 0 !important;
+        box-shadow: none !important;
+        outline: none !important;
     }
     [data-testid="stForm"] { border: 0; padding: 0; }
     [data-testid="stButton"] button {
@@ -429,6 +438,9 @@ st.markdown(
         background: var(--surface);
         color: var(--ink);
         font-size: .83rem;
+        appearance: none !important;
+        -webkit-appearance: none !important;
+        box-shadow: none !important;
         transition: border-color 120ms ease, background 120ms ease, color 120ms ease;
     }
     [data-testid="stButton"] button:hover { border-color: var(--line-strong); background: var(--surface-subtle); color: var(--ink); }
@@ -454,6 +466,9 @@ st.markdown(
         border: 1px solid var(--accent) !important;
         background: var(--accent) !important;
         color: var(--on-accent) !important;
+        appearance: none !important;
+        -webkit-appearance: none !important;
+        box-shadow: none !important;
         font-weight: 600;
         padding: 0 1rem !important;
         display: flex;
@@ -473,8 +488,8 @@ st.markdown(
     }
     [data-testid="stSpinner"] svg { color: var(--accent) !important; }
     [data-testid="stSpinner"] circle { stroke: var(--accent) !important; }
-    button:focus-visible, a:focus-visible, input:focus-visible, [role="combobox"]:focus-visible, summary:focus-visible {
-        outline: 3px solid var(--focus-ring) !important; outline-offset: 2px !important;
+    button:focus-visible, a:focus-visible, summary:focus-visible {
+        outline: 2px solid var(--focus) !important; outline-offset: 2px !important;
     }
     [data-testid="stVerticalBlockBorderWrapper"] {
         border: 1px solid var(--line) !important; border-radius: 16px !important; background: var(--surface) !important;
@@ -547,11 +562,27 @@ st.markdown(
         [data-testid="stMain"] .block-container { padding: 1.15rem 1rem 3rem; }
         [data-testid="stHeadingWithActionElements"] h1 { font-size: clamp(2.45rem, 11vw, 3.6rem) !important; }
         .hero-copy { font-size: 1rem; }
-        .st-key-archive-brand-row [data-testid="stHorizontalBlock"] { flex-wrap: wrap; row-gap: .2rem; }
-        .st-key-archive-brand-row [data-testid="column"]:nth-child(1) { flex: 1 1 100%; min-width: 100% !important; }
-        .st-key-archive-brand-row [data-testid="column"]:nth-child(2) { flex: 1 1 auto; min-width: 0 !important; }
-        .st-key-archive-brand-row [data-testid="column"]:nth-child(3) { flex: 0 0 44px; min-width: 44px !important; }
-        .brand-links { white-space: normal; }
+        .st-key-archive-brand-row [data-testid="stHorizontalBlock"] {
+            display: grid !important;
+            grid-template-columns: minmax(0, 1fr) 44px;
+            column-gap: .65rem;
+            row-gap: .5rem;
+        }
+        .st-key-archive-brand-row [data-testid="stHorizontalBlock"] > [data-testid="column"] {
+            width: auto !important;
+            min-width: 0 !important;
+            flex: none !important;
+        }
+        .st-key-archive-brand-row [data-testid="column"]:nth-child(1) { grid-column: 1 / -1; }
+        .st-key-archive-brand-row [data-testid="column"]:nth-child(2) { grid-column: 1; grid-row: 2; }
+        .st-key-archive-brand-row [data-testid="column"]:nth-child(3) {
+            grid-column: 2;
+            grid-row: 2;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+        }
+        .brand-links { white-space: nowrap; }
         .footer-content { align-items: flex-start; flex-direction: column; }
         .footer-actions { justify-content: flex-start; }
         .footer-social { justify-content: flex-start; gap: .8rem; }
@@ -900,10 +931,11 @@ button {{
   border: 1px solid {theme['accent']}; border-radius: 10px;
   background: {theme['accent']}; color: {theme['on_accent']};
   font: 600 .88rem/1.2 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  appearance: none; -webkit-appearance: none; box-shadow: none;
   cursor: pointer; transition: background-color 120ms ease, border-color 120ms ease;
 }}
 button:hover {{ background: {theme['accent_hover']}; border-color: {theme['accent_hover']}; }}
-button:focus-visible {{ outline: 3px solid {theme['focus_ring']}; outline-offset: 2px; }}
+button:focus-visible {{ outline: 2px solid {theme['focus']}; outline-offset: 2px; }}
 button[data-copied="true"] {{ background: {theme['success_bg']}; border-color: {theme['success_border']}; color: {theme['success']}; }}
 </style>
 </head>
