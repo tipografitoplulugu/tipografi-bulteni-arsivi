@@ -19,19 +19,159 @@ st.set_page_config(
     initial_sidebar_state="collapsed",
 )
 
+COLOR_THEMES = {
+    "light": {
+        "scheme": "light",
+        "paper": "#F7F8F5",
+        "surface": "#FFFFFF",
+        "surface_subtle": "#F0F2EB",
+        "ink": "#161811",
+        "muted": "#5D6255",
+        "placeholder": "#5D6255",
+        "line": "#DDE1D4",
+        "line_strong": "#C4CBB7",
+        "accent": "#D5FD42",
+        "accent_hover": "#C7EE35",
+        "accent_soft": "#EFF8CF",
+        "accent_soft_ink": "#334500",
+        "link": "#334500",
+        "link_hover": "#243400",
+        "on_accent": "#121212",
+        "focus": "#334500",
+        "focus_ring": "#334500",
+        "info_bg": "#EFF8CF",
+        "info_ink": "#161811",
+        "success": "#245C37",
+        "success_bg": "#EAF4E4",
+        "success_border": "#C5D8B8",
+        "danger": "#8A261E",
+        "danger_bg": "#FBEDEA",
+        "danger_border": "#E6C1BA",
+        "chart_grid": "#DDE1D4",
+        "chart_bar": "#334500",
+        "disabled_bg": "#ECEEE7",
+        "disabled_ink": "#5D6255",
+    },
+    "dark": {
+        "scheme": "dark",
+        "paper": "#121212",
+        "surface": "#1B1B1B",
+        "surface_subtle": "#252525",
+        "ink": "#F5F5F0",
+        "muted": "#A3A3A3",
+        "placeholder": "#A3A3A3",
+        "line": "#333333",
+        "line_strong": "#4A4A4A",
+        "accent": "#D5FD42",
+        "accent_hover": "#C7EE35",
+        "accent_soft": "#30391A",
+        "accent_soft_ink": "#D5FD42",
+        "link": "#D5FD42",
+        "link_hover": "#C7EE35",
+        "on_accent": "#121212",
+        "focus": "#D5FD42",
+        "focus_ring": "#D5FD42",
+        "info_bg": "#202619",
+        "info_ink": "#F5F5F0",
+        "success": "#B5E48A",
+        "success_bg": "#25331B",
+        "success_border": "#455C2A",
+        "danger": "#FFAAA3",
+        "danger_bg": "#3A211F",
+        "danger_border": "#70403C",
+        "chart_grid": "#333333",
+        "chart_bar": "#D5FD42",
+        "disabled_bg": "#262626",
+        "disabled_ink": "#A3A3A3",
+    },
+}
+
+THEME_STORAGE_KEY = "tipografi-archive-theme"
+URL_THEME = st.query_params.get("theme")
+if URL_THEME in COLOR_THEMES:
+    st.session_state["archive_theme"] = URL_THEME
+elif "archive_theme" not in st.session_state:
+    st.session_state["archive_theme"] = "light"
+
+
+def toggle_archive_theme() -> None:
+    next_theme = (
+        "light" if st.session_state.get("archive_theme") == "dark" else "dark"
+    )
+    st.session_state["archive_theme"] = next_theme
+    st.query_params["theme"] = next_theme
+
+
+CURRENT_THEME = COLOR_THEMES.get(st.session_state.get("archive_theme", "light"), COLOR_THEMES["light"])
+THEME_CSS_VARIABLES = "\n".join(
+    f"--{key.replace('_', '-')}: {value};"
+    for key, value in CURRENT_THEME.items()
+    if key != "scheme"
+)
+LIGHT_CSS_VARIABLES = "\n".join(
+    f"--{key.replace('_', '-')}: {value};"
+    for key, value in COLOR_THEMES["light"].items()
+    if key != "scheme"
+)
+DARK_CSS_VARIABLES = "\n".join(
+    f"--{key.replace('_', '-')}: {value};"
+    for key, value in COLOR_THEMES["dark"].items()
+    if key != "scheme"
+)
+THEME_BOOTSTRAP = f"""
+<script>
+(() => {{
+  const key = {THEME_STORAGE_KEY!r};
+  const valid = value => value === "light" || value === "dark";
+  const parentWindow = window.parent;
+  const root = parentWindow.document.documentElement;
+  const url = new URL(parentWindow.location.href);
+  const queryTheme = url.searchParams.get("theme");
+  let savedTheme = null;
+  try {{ savedTheme = parentWindow.localStorage.getItem(key); }} catch (error) {{}}
+  const systemTheme = parentWindow.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+  const theme = valid(queryTheme) ? queryTheme : (valid(savedTheme) ? savedTheme : systemTheme);
+  root.dataset.archiveTheme = theme;
+  root.style.colorScheme = theme;
+  try {{ parentWindow.localStorage.setItem(key, theme); }} catch (error) {{}}
+  if (!valid(queryTheme)) {{
+    url.searchParams.set("theme", theme);
+    parentWindow.location.replace(url.href);
+    return;
+  }}
+  const syncToggle = () => {{
+    const button = parentWindow.document.querySelector(".st-key-archive_theme_toggle button");
+    if (!button) return;
+    const current = root.dataset.archiveTheme;
+    button.setAttribute("aria-label", current === "dark" ? "Açık moda geç" : "Koyu moda geç");
+    button.setAttribute("title", current === "dark" ? "Açık moda geç" : "Koyu moda geç");
+    const icon = current === "dark" ? "☀" : "☾";
+    if (button.textContent.trim() !== icon) button.textContent = icon;
+  }};
+  syncToggle();
+  if (!parentWindow.__archiveThemeObserver) {{
+    parentWindow.__archiveThemeObserver = new MutationObserver(syncToggle);
+    parentWindow.__archiveThemeObserver.observe(parentWindow.document.body, {{ childList: true, subtree: true }});
+  }}
+}})();
+</script>
+"""
+components.html(THEME_BOOTSTRAP, height=0, scrolling=False)
+st.markdown(
+    f"""<style>
+    :root {{ color-scheme: {CURRENT_THEME['scheme']}; {THEME_CSS_VARIABLES} }}
+    :root[data-archive-theme="light"] {{ color-scheme: light; {LIGHT_CSS_VARIABLES} }}
+    :root[data-archive-theme="dark"] {{ color-scheme: dark; {DARK_CSS_VARIABLES} }}
+    @media (prefers-color-scheme: dark) {{
+      :root:not([data-archive-theme]) {{ color-scheme: dark; {DARK_CSS_VARIABLES} }}
+    }}
+    </style>""",
+    unsafe_allow_html=True,
+)
+
 st.markdown(
     """
     <style>
-    :root {
-        color-scheme: light;
-        --paper: #f7f6f3;
-        --surface: #fff;
-        --ink: #1d1c1a;
-        --muted: #716e68;
-        --line: #e6e3dd;
-        --accent: #81513e;
-        --focus: #9b5e43;
-    }
     html, body, [data-testid="stAppViewContainer"], [data-testid="stMain"] {
         background: var(--paper);
         color: var(--ink);
@@ -58,35 +198,44 @@ st.markdown(
     [data-testid="stHeadingWithActionElements"] h2 { font-size: clamp(1.6rem, 3vw, 2.2rem) !important; }
     p, li, label, [data-testid="stMarkdownContainer"] { color: var(--ink); }
     p { line-height: 1.7; }
-    a, [data-testid="stMarkdownContainer"] a { color: var(--accent) !important; text-underline-offset: 3px; }
-    a:hover { color: #543426 !important; }
+    a, [data-testid="stMarkdownContainer"] a { color: var(--link) !important; text-underline-offset: 3px; }
+    a:hover { color: var(--link-hover) !important; }
     .brand-logo {
         display: block; flex: 0 0 48px; width: 48px; height: 48px;
-        border-radius: 11px; background: var(--ink); object-fit: cover;
+        border-radius: 11px; background: var(--surface-subtle); object-fit: cover;
     }
-    .brand-header {
+    .brand-identity { display: flex; align-items: center; gap: .8rem; min-width: 0; }
+    .brand-links {
         display: flex;
         align-items: center;
         justify-content: flex-start;
-        gap: 1rem;
-        padding-bottom: .6rem;
-    }
-    .brand-identity { display: flex; align-items: center; gap: .8rem; }
-    .brand-links {
-        margin-left: 1rem;
         color: var(--muted);
         font-size: .88rem;
         white-space: nowrap;
     }
     .brand-name { font-size: 1.08rem; font-weight: 650; letter-spacing: .01em; }
+    .st-key-archive-brand-row [data-testid="stHorizontalBlock"] { align-items: center; gap: .6rem; }
+    .st-key-archive-brand-row [data-testid="column"] { min-width: 0 !important; }
+    [data-testid="stElementContainer"][class*="st-key-archive_theme_toggle"] [data-testid="stButton"] button {
+        width: 40px !important; min-width: 40px !important;
+        height: 40px !important; min-height: 40px !important;
+        padding: 0 !important; border-radius: 999px !important;
+        border-color: var(--line) !important; background: var(--surface) !important;
+        color: var(--link) !important; font-size: 1.15rem !important; line-height: 1 !important;
+    }
+    [data-testid="stElementContainer"][class*="st-key-archive_theme_toggle"] [data-testid="stButton"] button:hover {
+        border-color: var(--accent) !important;
+        background: var(--accent-soft) !important;
+        color: var(--link-hover) !important;
+    }
     .hero-eyebrow, .section-eyebrow {
-        color: var(--accent); font-size: .72rem; font-weight: 700;
+        color: var(--link); font-size: .72rem; font-weight: 700;
         letter-spacing: .13em; text-transform: uppercase;
     }
     .hero-copy {
         max-width: 690px;
         padding-bottom: 2.6rem;
-        color: #5f5c56;
+        color: var(--muted);
         font-size: 1.08rem;
         line-height: 1.72;
     }
@@ -135,7 +284,7 @@ st.markdown(
         gap: .75rem 1.1rem;
     }
     .footer-subscribe { color: var(--muted); font-size: inherit; }
-    .footer-subscribe a { color: var(--accent) !important; font-weight: 550; }
+    .footer-subscribe a { color: var(--link) !important; font-weight: 550; }
     .footer-social {
         display: flex;
         align-items: center;
@@ -154,7 +303,7 @@ st.markdown(
         text-decoration: none !important;
         transition: color 120ms ease;
     }
-    .footer-social a:hover { color: var(--accent) !important; }
+    .footer-social a:hover { color: var(--link) !important; }
     .footer-social svg { display: block; width: 100%; height: 100%; }
     .footer-social .icon-fill { fill: currentColor; }
     .footer-social .icon-stroke {
@@ -177,9 +326,14 @@ st.markdown(
     }
     [data-testid="stTextInput"] input,
     [data-testid="stSelectbox"] [role="combobox"] {
-        border: 1px solid #d8d5ce !important;
+        border: 1px solid var(--line) !important;
         background: var(--surface) !important;
         color: var(--ink) !important;
+    }
+    [data-testid="stTextInput"] input::placeholder,
+    [data-testid="stTextInputRootElement"] input::placeholder {
+        color: var(--placeholder) !important;
+        opacity: 1 !important;
     }
     /* Streamlit wraps text inputs in a theme-colored root that is separate
        from the input itself. Keep that wrapper the same size and surface. */
@@ -188,7 +342,7 @@ st.markdown(
         height: 48px !important;
         min-height: 48px !important;
         max-height: 48px !important;
-        border: 1px solid #d8d5ce !important;
+        border: 1px solid var(--line) !important;
         border-radius: 12px !important;
         background: var(--surface) !important;
         overflow: hidden;
@@ -206,7 +360,7 @@ st.markdown(
     [data-testid="stTextInputRootElement"]:focus-within,
     [data-testid="stSelectbox"] [role="group"]:focus-within {
         border-color: var(--focus) !important;
-        box-shadow: 0 0 0 3px rgba(129, 81, 62, .15) !important;
+        box-shadow: 0 0 0 3px var(--focus-ring) !important;
     }
     [data-testid="stSelectbox"] [data-baseweb="select"] > div,
     [data-testid="stSelectbox"] [data-baseweb="select"] > div > div,
@@ -226,7 +380,7 @@ st.markdown(
         height: 48px !important;
         min-height: 48px !important;
         max-height: 48px !important;
-        border: 1px solid #d8d5ce !important;
+        border: 1px solid var(--line) !important;
         border-radius: 12px !important;
         background: var(--surface) !important;
         overflow: hidden;
@@ -262,16 +416,36 @@ st.markdown(
         color: var(--muted) !important;
         fill: currentColor !important;
     }
+    [role="listbox"] [role="option"] { background: var(--surface) !important; color: var(--ink) !important; }
+    [role="listbox"] [role="option"]:hover { background: var(--surface-subtle) !important; }
+    [role="listbox"] [role="option"][aria-selected="true"] {
+        background: var(--accent-soft) !important;
+        color: var(--accent-soft-ink) !important;
+    }
     [data-testid="stTextInput"] input:focus,
     [data-testid="stSelectbox"] [role="combobox"]:focus {
-        border-color: var(--focus); box-shadow: 0 0 0 3px rgba(129, 81, 62, .15);
+        border-color: var(--focus) !important;
+        box-shadow: 0 0 0 3px var(--focus-ring) !important;
     }
     [data-testid="stForm"] { border: 0; padding: 0; }
     [data-testid="stButton"] button {
-        min-height: 40px; border: 1px solid #dedbd5; border-radius: 999px;
-        background: #fff; color: #393733; font-size: .83rem; transition: border-color 120ms ease, background 120ms ease;
+        min-height: 40px;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        background: var(--surface);
+        color: var(--ink);
+        font-size: .83rem;
+        transition: border-color 120ms ease, background 120ms ease, color 120ms ease;
     }
-    [data-testid="stButton"] button:hover { border-color: #b8a99e; background: #f2efeb; color: var(--ink); }
+    [data-testid="stButton"] button:hover { border-color: var(--line-strong); background: var(--surface-subtle); color: var(--ink); }
+    [data-testid="stButton"] button:disabled,
+    [data-testid="stFormSubmitButton"] button:disabled {
+        border-color: var(--line) !important;
+        background: var(--disabled-bg) !important;
+        color: var(--disabled-ink) !important;
+        opacity: 1 !important;
+        cursor: not-allowed !important;
+    }
     [data-testid="stElementContainer"][class*="st-key-topic_"] [data-testid="stButton"] button {
         opacity: .56;
         transition: opacity 140ms ease, border-color 140ms ease, background 140ms ease;
@@ -283,9 +457,9 @@ st.markdown(
         opacity: 1;
     }
     [data-testid="stFormSubmitButton"] button {
-        border: 1px solid var(--ink) !important;
-        background: var(--ink) !important;
-        color: white !important;
+        border: 1px solid var(--accent) !important;
+        background: var(--accent) !important;
+        color: var(--on-accent) !important;
         font-weight: 600;
         padding: 0 1rem !important;
         display: flex;
@@ -294,13 +468,19 @@ st.markdown(
     }
     [data-testid="stFormSubmitButton"] button p,
     [data-testid="stFormSubmitButton"] button span {
-        color: #fff !important;
+        color: var(--on-accent) !important;
         margin: 0;
         line-height: 1.2;
     }
-    [data-testid="stFormSubmitButton"] button:hover { border-color: #393733; background: #393733; color: white; }
+    [data-testid="stFormSubmitButton"] button:hover {
+        border-color: var(--accent-hover) !important;
+        background: var(--accent-hover) !important;
+        color: var(--on-accent) !important;
+    }
+    [data-testid="stSpinner"] svg { color: var(--accent) !important; }
+    [data-testid="stSpinner"] circle { stroke: var(--accent) !important; }
     button:focus-visible, a:focus-visible, input:focus-visible, [role="combobox"]:focus-visible, summary:focus-visible {
-        outline: 3px solid rgba(129, 81, 62, .55) !important; outline-offset: 2px !important;
+        outline: 3px solid var(--focus-ring) !important; outline-offset: 2px !important;
     }
     [data-testid="stVerticalBlockBorderWrapper"] {
         border: 1px solid var(--line) !important; border-radius: 16px !important; background: var(--surface) !important;
@@ -309,9 +489,9 @@ st.markdown(
         display: flex; flex-wrap: wrap; justify-content: space-between; gap: .35rem 1rem;
         margin-bottom: .6rem; color: var(--muted); font-size: .78rem; letter-spacing: .015em;
     }
-    .result-meta strong { color: var(--accent); font-weight: 650; }
-    .result-excerpt { margin: .2rem 0 .8rem; color: #4f4d48; font-size: .96rem; line-height: 1.72; }
-    mark.search-hit { border-radius: 3px; background: #f4e6d9; color: #442b20; padding: 0 .12em; }
+    .result-meta strong { color: var(--link); font-weight: 650; }
+    .result-excerpt { margin: .2rem 0 .8rem; color: var(--muted); font-size: .96rem; line-height: 1.72; }
+    mark.search-hit { border-radius: 3px; background: var(--accent-soft); color: var(--accent-soft-ink); padding: 0 .12em; }
     [data-testid="stExpander"] {
         border: 1px solid var(--line) !important;
         border-radius: 12px !important;
@@ -321,22 +501,22 @@ st.markdown(
     [data-testid="stExpander"] details,
     [data-testid="stExpander"] summary,
     [data-testid="stExpander"] details > summary {
-        background: #f7f6f3 !important;
+        background: var(--surface) !important;
         background-image: none !important;
     }
     [data-testid="stExpander"] summary,
     [data-testid="stExpander"] summary p {
-        color: #1d1c1a !important;
+        color: var(--ink) !important;
         font-size: .9rem;
         font-weight: 560;
         padding: .45rem .75rem;
     }
-    [data-testid="stExpander"] summary * { color: #1d1c1a !important; }
+    [data-testid="stExpander"] summary * { color: var(--ink) !important; }
     [data-testid="stExpander"] summary:hover,
     [data-testid="stExpander"] summary:hover * {
-        background: #f7f6f3 !important;
+        background: var(--surface-subtle) !important;
         background-image: none !important;
-        color: #1d1c1a !important;
+        color: var(--ink) !important;
     }
     [data-testid="stExpander"] [data-testid="stExpanderDetails"] {
         border-top: 1px solid var(--line);
@@ -346,13 +526,26 @@ st.markdown(
     .citation-box {
         border: 1px solid var(--line) !important;
         border-radius: 10px !important;
-        background: #f7f6f3 !important;
-        color: #1d1c1a !important;
+        background: var(--surface-subtle) !important;
+        color: var(--ink) !important;
         padding: .85rem 1rem;
         font-size: .94rem;
         line-height: 1.65;
         overflow-wrap: anywhere;
         word-break: normal;
+    }
+    .app-status {
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        background: var(--info-bg);
+        color: var(--info-ink);
+        padding: .85rem 1rem;
+        line-height: 1.6;
+    }
+    .app-status--error {
+        border-color: var(--danger-border);
+        background: var(--danger-bg);
+        color: var(--danger);
     }
     [data-testid="stCaptionContainer"] { color: var(--muted); }
     hr { border-color: var(--line) !important; }
@@ -360,8 +553,11 @@ st.markdown(
         [data-testid="stMain"] .block-container { padding: 1.15rem 1rem 3rem; }
         [data-testid="stHeadingWithActionElements"] h1 { font-size: clamp(2.45rem, 11vw, 3.6rem) !important; }
         .hero-copy { font-size: 1rem; }
-        .brand-header { align-items: flex-start; flex-direction: column; }
-        .brand-links { margin-left: 0; white-space: normal; }
+        .st-key-archive-brand-row [data-testid="stHorizontalBlock"] { flex-wrap: wrap; row-gap: .2rem; }
+        .st-key-archive-brand-row [data-testid="column"]:nth-child(1) { flex: 1 1 100%; min-width: 100% !important; }
+        .st-key-archive-brand-row [data-testid="column"]:nth-child(2) { flex: 1 1 auto; min-width: 0 !important; }
+        .st-key-archive-brand-row [data-testid="column"]:nth-child(3) { flex: 0 0 44px; min-width: 44px !important; }
+        .brand-links { white-space: normal; }
         .footer-content { align-items: flex-start; flex-direction: column; }
         .footer-actions { justify-content: flex-start; }
         .footer-social { justify-content: flex-start; gap: .8rem; }
@@ -680,7 +876,7 @@ def choose_topic(topic: str) -> None:
     st.session_state["archive_page"] = 1
 
 
-def copy_button_markup(value: str) -> str:
+def copy_button_markup(value: str, theme: dict[str, str]) -> str:
     """Build a compact, accessible clipboard button for an APA citation."""
     safe_value = html.escape(value, quote=True)
     return f"""<!doctype html>
@@ -692,14 +888,14 @@ def copy_button_markup(value: str) -> str:
 html, body {{ margin: 0; padding: 0; background: transparent; overflow: hidden; }}
 button {{
   display: block; width: 100%; height: 48px; padding: 0 .8rem;
-  border: 1px solid #1d1c1a; border-radius: 10px;
-  background: #1d1c1a; color: #fff;
+  border: 1px solid {theme['accent']}; border-radius: 10px;
+  background: {theme['accent']}; color: {theme['on_accent']};
   font: 600 .88rem/1.2 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   cursor: pointer; transition: background-color 120ms ease, border-color 120ms ease;
 }}
-button:hover {{ background: #393733; border-color: #393733; }}
-button:focus-visible {{ outline: 3px solid rgba(129, 81, 62, .55); outline-offset: 2px; }}
-button[data-copied="true"] {{ background: #52634b; border-color: #52634b; }}
+button:hover {{ background: {theme['accent_hover']}; border-color: {theme['accent_hover']}; }}
+button:focus-visible {{ outline: 3px solid {theme['focus_ring']}; outline-offset: 2px; }}
+button[data-copied="true"] {{ background: {theme['success_bg']}; border-color: {theme['success_border']}; color: {theme['success']}; }}
 </style>
 </head>
 <body>
@@ -746,11 +942,22 @@ button.addEventListener("click", async () => {{
 </html>"""
 
 
+def render_status(message: str, *, error: bool = False) -> None:
+    """Render a theme-aware status message with an appropriate live role."""
+    class_name = "app-status app-status--error" if error else "app-status"
+    role = "alert" if error else "status"
+    st.markdown(
+        f'<div class="{class_name}" role="{role}">{html.escape(message)}</div>',
+        unsafe_allow_html=True,
+    )
+
+
 db_path = find_database()
 if db_path is None:
-    st.error(
+    render_status(
         "Arşiv veritabanı bulunamadı. tipografi_arsivi.db dosyasını app.py ile "
-        "aynı klasöre koyun ya da TIPOGRAFI_DB_PATH ortam değişkeniyle yolunu belirtin."
+        "aynı klasöre koyun ya da TIPOGRAFI_DB_PATH ortam değişkeniyle yolunu belirtin.",
+        error=True,
     )
     st.stop()
 
@@ -759,26 +966,43 @@ try:
     total_issues, total_articles = get_counts(conn)
     available_years = get_years(conn)
 except (sqlite3.Error, OSError) as error:
-    st.error(f"Arşiv veritabanı okunamadı: {error}")
+    render_status(f"Arşiv veritabanı okunamadı: {error}", error=True)
     st.stop()
 
 
-st.markdown(
-    '<div class="brand-header"><div class="brand-identity">'
-    f'<img class="brand-logo" src="{LOGO_URL}" '
-    'alt="Türkçe Tipografi Topluluğu logosu">'
-    '<div><div class="brand-name">Türkçe Tipografi Topluluğu</div></div></div>'
-    '<div class="brand-links"><a href="https://tipografi.substack.com/">Substack</a>'
-    '　·　<a href="https://medium.com/tipografi">Medium</a></div></div>',
-    unsafe_allow_html=True,
-)
+with st.container(key="archive_brand_row"):
+    brand_col, links_col, theme_col = st.columns([5.5, 2.1, .55], vertical_alignment="center")
+    with brand_col:
+        st.markdown(
+            '<div class="brand-identity">'
+            f'<img class="brand-logo" src="{LOGO_URL}" '
+            'alt="Türkçe Tipografi Topluluğu logosu">'
+            '<div><div class="brand-name">Türkçe Tipografi Topluluğu</div></div></div>',
+            unsafe_allow_html=True,
+        )
+    with links_col:
+        st.markdown(
+            '<div class="brand-links"><a href="https://tipografi.substack.com/">Substack</a>'
+            '　·　<a href="https://medium.com/tipografi">Medium</a></div>',
+            unsafe_allow_html=True,
+        )
+    with theme_col:
+        is_dark = st.session_state.get("archive_theme") == "dark"
+        st.button(
+            "☀" if is_dark else "☾",
+            key="archive_theme_toggle",
+            help="Açık temaya geç" if is_dark else "Koyu temaya geç",
+            on_click=toggle_archive_theme,
+            type="secondary",
+        )
 
 st.markdown('<hr class="hero-rule">', unsafe_allow_html=True)
 st.title("Tipografi Bülteni Arşivi")
 st.markdown(
-    '<div class="hero-copy">Tipografi kültürüne dair haberleri, yazı tasarımını '
-    "ve görsel iletişim dünyasındaki gelişmeleri arayın. 2019 yılından bu yana yayımlanan "
-    "arşivin tamamı içinde keşfe başlayın.</div>",
+    '<div class="hero-copy">Türkiye’de ve dünyada tipografi ve yazı tasarımı alanında '
+    'yaşanan gelişmeleri, haberleri ve öne çıkan üretimleri bir araya getiriyoruz. '
+    '2019’dan bu yana aylık olarak yayımlanan bültenlerimizin tamamına arşivden '
+    'ulaşabilir, yeni sayılar eklendikçe büyüyen bu keşfe siz de katılabilirsiniz.</div>',
     unsafe_allow_html=True,
 )
 
@@ -835,7 +1059,7 @@ if st.session_state.get("_archive_filter_key") != filter_key:
 current_page = max(1, int(st.session_state.get("archive_page", 1)))
 
 if not query:
-    st.info(
+    render_status(
         "Bir konu yazarak tüm bültenlerde arayın ya da öne çıkan aramalardan "
         "birini seçin. Sonuçlar en yeni sayıdan başlayarak listelenir."
     )
@@ -849,7 +1073,10 @@ else:
             rows = fetch_matches(conn, where, params, current_page) if result_count else []
             distribution = get_year_distribution(conn, where, params) if result_count else None
     except sqlite3.Error as error:
-        st.error(f"Bu arama çalıştırılamadı. Başka bir ifade deneyin. Veritabanı yanıtı: {error}")
+        render_status(
+            f"Bu arama çalıştırılamadı. Başka bir ifade deneyin. Veritabanı yanıtı: {error}",
+            error=True,
+        )
         rows = []
         result_count = issue_count = 0
         page_count = 1
@@ -858,7 +1085,7 @@ else:
     if result_count:
         st.markdown(
             f"**{result_count:,}** gelişme · **{issue_count}** bülten"
-            f"　<span style='color:#716e68'>·　En yeniden eskiye</span>",
+            "　<span style='color:var(--muted)'>·　En yeniden eskiye</span>",
             unsafe_allow_html=True,
         )
         with st.expander("Yıllara göre dağılım", expanded=False):
@@ -866,9 +1093,9 @@ else:
             chart_spec = {
                 "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
                 "description": "Arama sonuçlarının yıllara göre dağılımı.",
-                "background": "#f7f6f3",
+                "background": CURRENT_THEME["paper"],
                 "height": 220,
-                "mark": {"type": "bar", "color": "#81513e"},
+                "mark": {"type": "bar", "color": CURRENT_THEME["chart_bar"]},
                 "encoding": {
                     "x": {
                         "field": "Yıl",
@@ -877,7 +1104,7 @@ else:
                         "axis": {
                             "title": None,
                             "labelAngle": 0,
-                            "labelColor": "#716e68",
+                            "labelColor": CURRENT_THEME["muted"],
                             "labelFontSize": 12,
                             "labelPadding": 10,
                             "tickSize": 0,
@@ -889,8 +1116,8 @@ else:
                         "type": "quantitative",
                         "axis": {
                             "title": None,
-                            "labelColor": "#716e68",
-                            "gridColor": "#e6e3dd",
+                            "labelColor": CURRENT_THEME["muted"],
+                            "gridColor": CURRENT_THEME["chart_grid"],
                             "gridOpacity": 1,
                             "tickColor": "transparent",
                             "domain": False,
@@ -960,7 +1187,7 @@ else:
                         )
                     with copy_col:
                         components.html(
-                            copy_button_markup(citation), height=52, scrolling=False
+                            copy_button_markup(citation, CURRENT_THEME), height=52, scrolling=False
                         )
 
         if page_count > 1:
@@ -973,7 +1200,7 @@ else:
                 )
             with label_col:
                 st.markdown(
-                    f"<p style='text-align:center;color:#716e68'>Sayfa {current_page} / {page_count}</p>",
+                    f"<p style='text-align:center;color:var(--muted)'>Sayfa {current_page} / {page_count}</p>",
                     unsafe_allow_html=True,
                 )
             with next_col:
@@ -982,7 +1209,7 @@ else:
                     args=(current_page + 1,), use_container_width=True, key="next_page",
                 )
     else:
-        st.info(
+        render_status(
             f"“{query}” ifadesiyle"
             + (f" {selected_year} yılında" if selected_year != ALL_YEARS else "")
             + " eşleşen bir gelişme bulunamadı. Yazımı kontrol edin veya daha kısa bir arama deneyin."
