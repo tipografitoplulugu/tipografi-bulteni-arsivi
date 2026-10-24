@@ -700,7 +700,7 @@ st.markdown(
 stat_cols = st.columns(3)
 for column, label, value in zip(
     stat_cols,
-    ("Yayımlanan sayı", "İndekslenen gelişme", "Arşiv kapsamı"),
+    ("Yayımlanan sayı", "İndekslenen gelişme", "ARŞİV KAPSAMI"),
     (f"{total_issues:,}", f"{total_articles:,}",
      f"{min(available_years)}—{max(available_years)}" if available_years else "—"),
 ):
