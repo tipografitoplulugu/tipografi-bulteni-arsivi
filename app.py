@@ -2,6 +2,7 @@ import html
 import os
 import re
 import sqlite3
+import unicodedata
 from pathlib import Path
 from typing import Optional
 
@@ -71,7 +72,13 @@ st.markdown(
         color: var(--accent); font-size: .72rem; font-weight: 700;
         letter-spacing: .13em; text-transform: uppercase;
     }
-    .hero-copy { max-width: 690px; color: #5f5c56; font-size: 1.08rem; line-height: 1.72; }
+    .hero-copy {
+        max-width: 690px;
+        padding-bottom: 2.6rem;
+        color: #5f5c56;
+        font-size: 1.08rem;
+        line-height: 1.72;
+    }
     .hero-rule { border: 0; border-top: 1px solid var(--line); margin: 1.8rem 0 1.5rem; }
     .stat-label { color: var(--muted); font-size: .75rem; letter-spacing: .04em; text-transform: uppercase; }
     .stat-value { margin-top: .25rem; color: var(--ink); font: 1.45rem Georgia, serif; letter-spacing: -.03em; }
@@ -92,6 +99,11 @@ st.markdown(
         min-height: 48px; border: 1px solid var(--ink); border-radius: 12px;
         background: var(--ink); color: white; font-weight: 600;
     }
+    [data-testid="stFormSubmitButton"] button p,
+    [data-testid="stFormSubmitButton"] button span {
+        color: #fff !important;
+        margin: 0;
+    }
     [data-testid="stFormSubmitButton"] button:hover { border-color: #393733; background: #393733; color: white; }
     button:focus-visible, a:focus-visible, input:focus-visible, [role="combobox"]:focus-visible, summary:focus-visible {
         outline: 3px solid rgba(129, 81, 62, .55) !important; outline-offset: 2px !important;
@@ -106,8 +118,34 @@ st.markdown(
     .result-meta strong { color: var(--accent); font-weight: 650; }
     .result-excerpt { margin: .2rem 0 .8rem; color: #4f4d48; font-size: .96rem; line-height: 1.72; }
     mark.search-hit { border-radius: 3px; background: #f4e6d9; color: #442b20; padding: 0 .12em; }
-    [data-testid="stExpander"] { border-color: var(--line) !important; border-radius: 10px !important; background: transparent; }
-    [data-testid="stExpander"] summary { color: #46433e; font-size: .88rem; }
+    [data-testid="stExpander"] {
+        border: 1px solid var(--line) !important;
+        border-radius: 12px !important;
+        background: var(--surface) !important;
+        overflow: hidden;
+    }
+    [data-testid="stExpander"] summary {
+        color: var(--ink);
+        font-size: .9rem;
+        font-weight: 560;
+        padding: .2rem .25rem;
+    }
+    [data-testid="stExpander"] [data-testid="stExpanderDetails"] {
+        border-top: 1px solid var(--line);
+        padding: .8rem 1rem .9rem;
+    }
+    [data-testid="stCodeBlock"] {
+        border: 1px solid var(--line) !important;
+        border-radius: 10px !important;
+        background: var(--paper) !important;
+    }
+    [data-testid="stCodeBlock"] pre,
+    [data-testid="stCodeBlock"] code {
+        background: transparent !important;
+        color: var(--ink) !important;
+        white-space: pre-wrap !important;
+        overflow-wrap: anywhere;
+    }
     [data-testid="stCaptionContainer"] { color: var(--muted); }
     hr { border-color: var(--line) !important; }
     @media (max-width: 760px) {
@@ -291,6 +329,64 @@ def plain_text(markdown_text: str) -> str:
     return re.sub(r"\s+", " ", text).strip()
 
 
+def normalize_for_match(text: str) -> str:
+    """Normalize accents and Turkish dotted/dotless i for snippet matching."""
+    folded = unicodedata.normalize("NFKD", text.casefold().replace("ı", "i"))
+    folded = "".join(char for char in folded if not unicodedata.combining(char))
+    return " ".join(re.sub(r"[^\w]+", " ", folded, flags=re.UNICODE).split())
+
+
+def text_contains_query(text: str, query: str) -> bool:
+    normalized_text = normalize_for_match(text)
+    normalized_query = normalize_for_match(query)
+    return bool(normalized_query and normalized_query in normalized_text)
+
+
+def crop_around_query(sentence: str, query: str, limit: int = 460) -> str:
+    if len(sentence) <= limit or len(query) >= limit:
+        return sentence
+    position = sentence.casefold().find(query.casefold())
+    if position < 0:
+        return sentence
+    start = max(0, position - (limit - len(query)) // 2)
+    end = min(len(sentence), start + limit)
+    start = max(0, end - limit)
+    while start > 0 and not sentence[start - 1].isspace():
+        start -= 1
+    while end < len(sentence) and not sentence[end - 1].isspace():
+        end += 1
+    excerpt = sentence[start:end].strip()
+    return ("…" if start else "") + excerpt + ("…" if end < len(sentence) else "")
+
+
+def matching_excerpt(title: str, body: str, query: str) -> str:
+    """Choose a sentence that contains the searched phrase, not the article opening."""
+    search_body = body
+    if "küçük puntolar" in title.casefold():
+        matching_lines = [
+            line for line in body.splitlines() if text_contains_query(plain_text(line), query)
+        ]
+        if matching_lines:
+            search_body = "\n".join(matching_lines)
+
+    readable = plain_text(search_body)
+    sentences = [
+        part.strip()
+        for part in re.split(r"(?<=[.!?])\s+", readable)
+        if part.strip()
+    ]
+    for sentence in sentences:
+        if text_contains_query(sentence, query):
+            return crop_around_query(sentence, query)
+
+    # FTS5 also indexes headings and Markdown link destinations. Make those
+    # matches explicit if the visible body text has no matching sentence.
+    readable_title = plain_text(title)
+    if text_contains_query(readable_title, query):
+        return f"Başlıkta eşleşme: {readable_title}."
+    return f"Aranan ifade “{query}” bu kaydın içeriğindeki bir bağlantıda eşleşiyor."
+
+
 def highlighted_excerpt(text: str, query: str) -> str:
     """Return escaped HTML with a safe, understated match highlight."""
     if not query:
@@ -426,7 +522,9 @@ st.markdown('<hr class="hero-rule">', unsafe_allow_html=True)
 st.markdown('<div class="section-eyebrow">Arşivde ara</div>', unsafe_allow_html=True)
 
 with st.form("archive_search"):
-    search_col, year_col, submit_col = st.columns([5, 1.6, 1.05])
+    search_col, year_col, submit_col = st.columns(
+        [5, 1.6, 1.05], vertical_alignment="bottom"
+    )
     with search_col:
         st.text_input(
             "Aranacak ifade", key="archive_query",
@@ -483,21 +581,13 @@ else:
             unsafe_allow_html=True,
         )
         with st.expander("Yıllara göre dağılım", expanded=False):
-            st.bar_chart(distribution, height=220)
+            st.bar_chart(distribution, height=220, color="#81513e")
 
         for row in rows:
             clean_issue = issue_name(row["bulten_adi"] or "")
             issue_url = get_issue_url(clean_issue, int(row["yil"] or 0))
             body = clean_visual_lines(row["icerik"] or "")
-            summary = plain_text(body)
-            if "küçük puntolar" in (row["baslik"] or "").casefold():
-                hits = [
-                    plain_text(line) for line in body.splitlines()
-                    if query.casefold() in plain_text(line).casefold()
-                ]
-                if hits:
-                    summary = " ".join(hits)
-            excerpt = summary if len(summary) <= 420 else summary[:417].rsplit(" ", 1)[0] + "…"
+            excerpt = matching_excerpt(row["baslik"] or "", body, query)
 
             with st.container(border=True):
                 st.markdown(
@@ -515,12 +605,7 @@ else:
                 st.markdown(f"[Bu sayıyı aç ↗]({issue_url})")
 
                 if body:
-                    label = (
-                        "Bu sayının tüm Küçük Puntolar maddelerini göster"
-                        if "küçük puntolar" in (row["baslik"] or "").casefold()
-                        else "Tam metni oku"
-                    )
-                    with st.expander(label, expanded=False):
+                    with st.expander("Tam metni oku", expanded=False):
                         st.markdown(body)
 
                 title = re.sub(r"[*_#]", "", row["baslik"] or "").strip().replace(chr(96), "")
