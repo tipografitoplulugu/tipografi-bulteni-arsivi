@@ -425,6 +425,9 @@ st.markdown(
         stroke-linejoin: round;
         stroke-width: 2;
     }
+    [data-testid="stTextInput"] label {
+        display: none !important;
+    }
     [data-testid="stTextInput"] input,
     [data-testid="stSelectbox"] [role="combobox"],
     [data-testid="stFormSubmitButton"] button {
@@ -1217,6 +1220,7 @@ with st.form("archive_search"):
         st.text_input(
             "Aranacak ifade", key="archive_query",
             placeholder="Örn. değişken yazıtipi, Monotype, kaligrafi",
+            label_visibility="collapsed",
         )
     with year_col:
         st.selectbox("Yıl", [ALL_YEARS, *available_years], key="archive_year")
@@ -1244,14 +1248,7 @@ if st.session_state.get("_archive_filter_key") != filter_key:
     st.session_state["archive_page"] = 1
 current_page = max(1, int(st.session_state.get("archive_page", 1)))
 
-if not query:
-    if st.session_state.get("scroll_to_results"):
-        st.markdown('<div id="first-result"></div>', unsafe_allow_html=True)
-    render_status(
-        "Bir konu yazarak tüm bültenlerde arayın ya da öne çıkan aramalardan "
-        "birini seçin. Sonuçlar en yeni sayıdan başlayarak listelenir."
-    )
-else:
+if query:
     try:
         where, params = result_filter(query, selected_year)
         with st.spinner("Arşiv taranıyor…"):
