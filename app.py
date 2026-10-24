@@ -99,6 +99,33 @@ st.markdown(
         background: var(--surface) !important;
         color: var(--ink) !important;
     }
+    /* Streamlit wraps text inputs in a theme-colored root that is separate
+       from the input itself. Keep that wrapper the same size and surface. */
+    [data-testid="stTextInputRootElement"] {
+        box-sizing: border-box !important;
+        height: 48px !important;
+        min-height: 48px !important;
+        max-height: 48px !important;
+        border: 1px solid #d8d5ce !important;
+        border-radius: 12px !important;
+        background: var(--surface) !important;
+        overflow: hidden;
+    }
+    [data-testid="stTextInputRootElement"] [data-testid="stTextInputField"] {
+        box-sizing: border-box !important;
+        height: 46px !important;
+        min-height: 46px !important;
+        max-height: 46px !important;
+        border: 0 !important;
+        border-radius: 0 !important;
+        background: transparent !important;
+        box-shadow: none !important;
+    }
+    [data-testid="stTextInputRootElement"]:focus-within,
+    [data-testid="stSelectbox"] [role="group"]:focus-within {
+        border-color: var(--focus) !important;
+        box-shadow: 0 0 0 3px rgba(129, 81, 62, .15) !important;
+    }
     [data-testid="stSelectbox"] [data-baseweb="select"] > div,
     [data-testid="stSelectbox"] [data-baseweb="select"] > div > div,
     [data-testid="stSelectbox"] [data-baseweb="select"] > div > div > div {
@@ -108,6 +135,50 @@ st.markdown(
     [data-testid="stSelectbox"] [data-baseweb="select"] svg {
         color: var(--muted) !important;
         fill: var(--muted) !important;
+    }
+    /* Streamlit's current selectbox uses a React Aria group around its input
+       and chevron button. Style that group directly; the input alone does
+       not control the dark trailing segment. */
+    [data-testid="stSelectbox"] [role="group"] {
+        box-sizing: border-box !important;
+        height: 48px !important;
+        min-height: 48px !important;
+        max-height: 48px !important;
+        border: 1px solid #d8d5ce !important;
+        border-radius: 12px !important;
+        background: var(--surface) !important;
+        overflow: hidden;
+    }
+    [data-testid="stSelectbox"] [role="group"] [role="combobox"] {
+        box-sizing: border-box !important;
+        height: 46px !important;
+        min-height: 46px !important;
+        max-height: 46px !important;
+        border: 0 !important;
+        border-radius: 0 !important;
+        background: transparent !important;
+        box-shadow: none !important;
+    }
+    [data-testid="stSelectbox"] [role="group"] button {
+        box-sizing: border-box !important;
+        width: 42px !important;
+        height: 46px !important;
+        min-height: 46px !important;
+        border: 0 !important;
+        border-radius: 0 !important;
+        background: var(--surface) !important;
+        color: var(--muted) !important;
+        padding: 0 !important;
+        box-shadow: none !important;
+    }
+    [data-testid="stSelectbox"] [role="group"] button:hover,
+    [data-testid="stSelectbox"] [role="group"] button:focus {
+        background: var(--surface) !important;
+        color: var(--ink) !important;
+    }
+    [data-testid="stSelectbox"] [role="group"] svg {
+        color: var(--muted) !important;
+        fill: currentColor !important;
     }
     [data-testid="stTextInput"] input:focus,
     [data-testid="stSelectbox"] [role="combobox"]:focus {
