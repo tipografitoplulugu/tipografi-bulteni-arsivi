@@ -343,6 +343,12 @@ st.markdown(
     .hero-eyebrow, .section-eyebrow {
         color: var(--link); font-size: .72rem; font-weight: 700;
         letter-spacing: .13em; text-transform: uppercase;
+        display: block;
+        margin-bottom: .65rem;
+    }
+    .topics-eyebrow {
+        margin-top: 1.35rem;
+        margin-bottom: .75rem;
     }
     .hero-copy {
         max-width: 690px;
@@ -1235,7 +1241,7 @@ with st.form("archive_search"):
 if search_submitted:
     st.session_state["scroll_to_results"] = True
 
-st.markdown("**Öne çıkan aramalar**")
+st.markdown('<div class="section-eyebrow topics-eyebrow">ÖNE ÇIKAN ARAMALAR</div>', unsafe_allow_html=True)
 for row_start in range(0, len(POPULAR_TOPICS), 3):
     topic_cols = st.columns(3)
     for offset, topic in enumerate(POPULAR_TOPICS[row_start:row_start + 3]):
