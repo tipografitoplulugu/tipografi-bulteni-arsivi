@@ -165,10 +165,86 @@ THEME_BOOTSTRAP = f"""
       }});
     }}
   }};
+  const performScroll = () => {{
+    let attempts = 0;
+    const timer = setInterval(() => {{
+      attempts++;
+      const el = parentWindow.document.getElementById("first-result")
+              || parentWindow.document.querySelector(".app-status");
+      if (el) {{
+        clearInterval(timer);
+        const reduced = parentWindow.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        el.scrollIntoView({{ behavior: reduced ? "auto" : "smooth", block: "start" }});
+      }} else if (attempts >= 60) {{
+        clearInterval(timer);
+      }}
+    }}, 30);
+  }};
+  parentWindow.__scrollToFirstResult = performScroll;
+
+  const bindSearchTriggers = () => {{
+    const topicButtons = parentWindow.document.querySelectorAll("[class*='st-key-topic_'] button");
+    topicButtons.forEach(btn => {{
+      if (btn.dataset.scrollBound !== "true") {{
+        btn.dataset.scrollBound = "true";
+        btn.addEventListener("click", () => {{
+          parentWindow.__shouldScrollToResult = true;
+        }});
+      }}
+    }});
+    const submitBtn = parentWindow.document.querySelector("[data-testid='stFormSubmitButton'] button");
+    if (submitBtn && submitBtn.dataset.scrollBound !== "true") {{
+      submitBtn.dataset.scrollBound = "true";
+      submitBtn.addEventListener("click", () => {{
+        parentWindow.__shouldScrollToResult = true;
+      }});
+    }}
+    const searchInput = parentWindow.document.querySelector("[data-testid='stTextInput'] input");
+    if (searchInput && searchInput.dataset.scrollBound !== "true") {{
+      searchInput.dataset.scrollBound = "true";
+      searchInput.addEventListener("keydown", (e) => {{
+        if (e.key === "Enter") {{
+          parentWindow.__shouldScrollToResult = true;
+        }}
+      }});
+    }}
+    const prevBtn = parentWindow.document.querySelector(".st-key-previous_page button");
+    if (prevBtn && prevBtn.dataset.scrollBound !== "true") {{
+      prevBtn.dataset.scrollBound = "true";
+      prevBtn.addEventListener("click", () => {{
+        parentWindow.__shouldScrollToResult = true;
+      }});
+    }}
+    const nextBtn = parentWindow.document.querySelector(".st-key-next_page button");
+    if (nextBtn && nextBtn.dataset.scrollBound !== "true") {{
+      nextBtn.dataset.scrollBound = "true";
+      nextBtn.addEventListener("click", () => {{
+        parentWindow.__shouldScrollToResult = true;
+      }});
+    }}
+  }};
+
+  const handleObserver = () => {{
+    syncToggle();
+    bindSearchTriggers();
+    if (parentWindow.__shouldScrollToResult) {{
+      const el = parentWindow.document.getElementById("first-result")
+              || parentWindow.document.querySelector(".app-status");
+      if (el) {{
+        parentWindow.__shouldScrollToResult = false;
+        const reduced = parentWindow.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        setTimeout(() => {{
+          el.scrollIntoView({{ behavior: reduced ? "auto" : "smooth", block: "start" }});
+        }}, 40);
+      }}
+    }}
+  }};
+
   parentWindow.__archiveThemeCurrent = serverTheme;
   syncToggle();
+  bindSearchTriggers();
   if (!parentWindow.__archiveThemeObserver) {{
-    parentWindow.__archiveThemeObserver = new MutationObserver(syncToggle);
+    parentWindow.__archiveThemeObserver = new MutationObserver(handleObserver);
     parentWindow.__archiveThemeObserver.observe(parentWindow.document.body, {{ childList: true, subtree: true }});
   }}
   if (!parentWindow.document.querySelector("link[href*='family=Inter']")) {{
@@ -606,6 +682,34 @@ st.markdown(
         color: var(--info-ink);
         padding: .85rem 1rem;
         line-height: 1.6;
+        scroll-margin-top: 2rem;
+    }
+    #first-result {
+        scroll-margin-top: 5rem;
+        display: block;
+        height: 0;
+        margin: 0;
+        padding: 0;
+    }
+    [data-testid="stCustomComponentV1"]:has(iframe[height="0"]) {
+        position: absolute !important;
+        width: 0 !important;
+        height: 0 !important;
+        min-height: 0 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        overflow: hidden !important;
+        opacity: 0 !important;
+        pointer-events: none !important;
+    }
+    iframe[height="0"] {
+        position: absolute !important;
+        height: 0 !important;
+        min-height: 0 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        overflow: hidden !important;
+        opacity: 0 !important;
     }
     .app-status--error {
         border-color: var(--danger-border);
@@ -615,6 +719,7 @@ st.markdown(
     [data-testid="stCaptionContainer"] { color: var(--muted); }
     hr { border-color: var(--line) !important; }
     @media (max-width: 760px) {
+        #first-result { scroll-margin-top: 4rem; }
         [data-testid="stMain"] .block-container { padding: 1.15rem 1rem 3rem; }
         [data-testid="stHeadingWithActionElements"] h1 { font-size: clamp(2.45rem, 11vw, 3.6rem) !important; }
         .hero-copy { font-size: 1rem; }
@@ -948,11 +1053,13 @@ def get_year_distribution(connection: sqlite3.Connection, where: str, params: li
 
 def set_page(page: int) -> None:
     st.session_state["archive_page"] = page
+    st.session_state["scroll_to_results"] = True
 
 
 def choose_topic(topic: str) -> None:
     st.session_state["archive_query"] = topic
     st.session_state["archive_page"] = 1
+    st.session_state["scroll_to_results"] = True
 
 
 def copy_button_markup(value: str, theme: dict[str, str]) -> str:
@@ -1114,7 +1221,10 @@ with st.form("archive_search"):
     with year_col:
         st.selectbox("Yıl", [ALL_YEARS, *available_years], key="archive_year")
     with submit_col:
-        st.form_submit_button("Ara", type="primary", use_container_width=True)
+        search_submitted = st.form_submit_button("Ara", type="primary", use_container_width=True)
+
+if search_submitted:
+    st.session_state["scroll_to_results"] = True
 
 st.markdown("**Öne çıkan aramalar**")
 for row_start in range(0, len(POPULAR_TOPICS), 3):
@@ -1135,6 +1245,8 @@ if st.session_state.get("_archive_filter_key") != filter_key:
 current_page = max(1, int(st.session_state.get("archive_page", 1)))
 
 if not query:
+    if st.session_state.get("scroll_to_results"):
+        st.markdown('<div id="first-result"></div>', unsafe_allow_html=True)
     render_status(
         "Bir konu yazarak tüm bültenlerde arayın ya da öne çıkan aramalardan "
         "birini seçin. Sonuçlar en yeni sayıdan başlayarak listelenir."
@@ -1223,7 +1335,7 @@ else:
                 alt="Arama sonuçlarının yıllara göre dağılımı",
             )
 
-        for row in rows:
+        for idx, row in enumerate(rows):
             clean_issue = issue_name(row["bulten_adi"] or "")
             issue_url = get_issue_url(clean_issue, int(row["yil"] or 0))
             body = clean_visual_lines(row["icerik"] or "")
@@ -1231,6 +1343,8 @@ else:
             excerpt = matching_excerpt(row["baslik"] or "", body, query)
 
             with st.container(border=True):
+                if idx == 0:
+                    st.markdown('<div id="first-result"></div>', unsafe_allow_html=True)
                 st.markdown(
                     '<div class="result-meta">'
                     f'<strong>{html.escape(turkish_upper(clean_issue))}</strong>'
@@ -1286,11 +1400,45 @@ else:
                     args=(current_page + 1,), use_container_width=True, key="next_page",
                 )
     else:
+        st.markdown('<div id="first-result"></div>', unsafe_allow_html=True)
         render_status(
             f"“{query}” ifadesiyle"
             + (f" {selected_year} yılında" if selected_year != ALL_YEARS else "")
             + " eşleşen bir gelişme bulunamadı. Yazımı kontrol edin veya daha kısa bir arama deneyin."
         )
+
+if st.session_state.pop("scroll_to_results", False):
+    scroll_seq = st.session_state.get("_scroll_seq", 0) + 1
+    st.session_state["_scroll_seq"] = scroll_seq
+    scroll_trigger = f"""<!doctype html>
+<html>
+<head><meta charset="utf-8"></head>
+<body style="margin:0;padding:0;">
+<script>
+(() => {{
+  const p = window.parent;
+  if (!p) return;
+  if (typeof p.__scrollToFirstResult === 'function') {{
+    p.__scrollToFirstResult();
+  }} else {{
+    let count = 0;
+    const t = setInterval(() => {{
+      count++;
+      const el = p.document.getElementById('first-result') || p.document.querySelector('.app-status');
+      if (el) {{
+        clearInterval(t);
+        const reduced = p.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        el.scrollIntoView({{ behavior: reduced ? 'auto' : 'smooth', block: 'start' }});
+      }} else if (count >= 60) {{
+        clearInterval(t);
+      }}
+    }}, 30);
+  }}
+}})();
+</script>
+</body>
+</html>"""
+    components.html(scroll_trigger, height=0, scrolling=False)
 
 st.markdown('<hr class="hero-rule">', unsafe_allow_html=True)
 st.markdown(
