@@ -699,6 +699,11 @@ def issue_name(full_name: str) -> str:
     return full_name.split(":", 1)[-1].strip() if ":" in full_name else full_name.strip()
 
 
+def turkish_upper(text: str) -> str:
+    """Uppercase Turkish text with the correct dotted and dotless I forms."""
+    return text.translate(str.maketrans({"i": "İ", "ı": "I"})).upper()
+
+
 def get_issue_url(name: str, year: int) -> str:
     clean_name = issue_name(name)
     if clean_name in BULTEN_URLS:
@@ -1161,7 +1166,7 @@ else:
             with st.container(border=True):
                 st.markdown(
                     '<div class="result-meta">'
-                    f'<strong>{html.escape(clean_issue.upper())}</strong>'
+                    f'<strong>{html.escape(turkish_upper(clean_issue))}</strong>'
                     '</div>',
                     unsafe_allow_html=True,
                 )
