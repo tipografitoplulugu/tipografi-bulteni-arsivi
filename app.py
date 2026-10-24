@@ -744,6 +744,16 @@ def text_contains_query(text: str, query: str) -> bool:
     return bool(normalized_query and normalized_query in normalized_text)
 
 
+def matching_paragraphs(body: str, query: str) -> list[str]:
+    """Return only readable Markdown paragraphs that contain the search query."""
+    paragraphs = re.split(r"\n\s*\n", clean_visual_lines(body).strip())
+    return [
+        paragraph.strip()
+        for paragraph in paragraphs
+        if paragraph.strip() and text_contains_query(plain_text(paragraph), query)
+    ]
+
+
 def crop_around_query(sentence: str, query: str, limit: int = 460) -> str:
     if len(sentence) <= limit or len(query) >= limit:
         return sentence
@@ -1145,6 +1155,7 @@ else:
             clean_issue = issue_name(row["bulten_adi"] or "")
             issue_url = get_issue_url(clean_issue, int(row["yil"] or 0))
             body = clean_visual_lines(row["icerik"] or "")
+            relevant_paragraphs = matching_paragraphs(body, query)
             excerpt = matching_excerpt(row["baslik"] or "", body, query)
 
             with st.container(border=True):
@@ -1161,9 +1172,9 @@ else:
                 )
                 st.markdown(f"[Bu sayıyı aç ↗]({issue_url})")
 
-                if body:
-                    with st.expander("Tam metni oku", expanded=False):
-                        st.markdown(body)
+                if relevant_paragraphs:
+                    with st.expander("İlgili paragrafları oku", expanded=False):
+                        st.markdown("\n\n".join(relevant_paragraphs))
 
                 title = re.sub(r"[*_#]", "", row["baslik"] or "").strip().replace(chr(96), "")
                 citation = (
