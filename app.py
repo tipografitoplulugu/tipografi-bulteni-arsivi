@@ -171,10 +171,10 @@ THEME_BOOTSTRAP = f"""
     parentWindow.__archiveThemeObserver = new MutationObserver(syncToggle);
     parentWindow.__archiveThemeObserver.observe(parentWindow.document.body, {{ childList: true, subtree: true }});
   }}
-  if (!parentWindow.document.querySelector("link[href*='Instrument+Serif']")) {{
+  if (!parentWindow.document.querySelector("link[href*='family=Inter']")) {{
     const linkFont = parentWindow.document.createElement("link");
     linkFont.rel = "stylesheet";
-    linkFont.href = "https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap";
+    linkFont.href = "https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700&display=swap";
     parentWindow.document.head.appendChild(linkFont);
   }}
 }})();
@@ -189,12 +189,12 @@ st.markdown(
 st.markdown(
     """
     <style>
-    @import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700&display=swap');
 
     html, body, [data-testid="stAppViewContainer"], [data-testid="stMain"] {
         background: var(--paper);
         color: var(--ink);
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        font-family: "Inter", sans-serif;
     }
     /* Hide Streamlit's in-app toolbar actions (Share, menu, and adjacent
        controls). The content links below are also left-aligned so they stay
@@ -205,7 +205,7 @@ st.markdown(
     [data-testid="stMain"] .block-container { max-width: 1120px; padding: 2rem 2.25rem 5rem; }
     h1, h2, h3, h4 {
         color: var(--ink) !important;
-        font-family: "Instrument Serif", Georgia, serif !important;
+        font-family: "Instrument Serif", serif !important;
         font-weight: 400 !important;
         letter-spacing: -0.02em !important;
     }
@@ -293,7 +293,7 @@ st.markdown(
     }
     .stat-value {
         color: var(--ink);
-        font: 1.55rem/1.2 "Instrument Serif", Georgia, serif;
+        font: 1.55rem/1.2 "Instrument Serif", serif;
         letter-spacing: -.02em;
         overflow-wrap: anywhere;
     }
@@ -962,6 +962,7 @@ def copy_button_markup(value: str, theme: dict[str, str]) -> str:
 <html lang="tr">
 <head>
 <meta charset="utf-8">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@600&display=swap">
 <style>
 * {{ box-sizing: border-box; }}
 html, body {{ margin: 0; padding: 0; background: transparent; overflow: hidden; }}
@@ -969,7 +970,7 @@ button {{
   display: block; width: 100%; height: 48px; padding: 0 .8rem;
   border: 1px solid {theme['accent']}; border-radius: 10px;
   background: {theme['accent']}; color: {theme['on_accent']};
-  font: 600 .88rem/1.2 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font: 600 .88rem/1.2 "Inter", sans-serif;
   appearance: none; -webkit-appearance: none; box-shadow: none;
   cursor: pointer; transition: background-color 120ms ease, border-color 120ms ease;
 }}
@@ -1210,7 +1211,7 @@ else:
                 },
                 "config": {
                     "view": {"stroke": None},
-                    "axis": {"labelFont": "sans-serif", "gridWidth": 1},
+                    "axis": {"labelFont": "Inter, sans-serif", "gridWidth": 1},
                 },
             }
             st.vega_lite_chart(
