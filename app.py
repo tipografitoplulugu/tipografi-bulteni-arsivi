@@ -1012,7 +1012,7 @@ st.markdown(
 
 stat_items = []
 for label, value in zip(
-    ("Yayımlanan sayı", "İndekslenen gelişme", "ARŞİV KAPSAMI"),
+    ("YAYIMLANAN SAYI", "İNDEKSLENEN GELİŞME", "ARŞİV KAPSAMI"),
     (f"{total_issues:,}", f"{total_articles:,}",
      f"{min(available_years)}—{max(available_years)}" if available_years else "—"),
 ):
