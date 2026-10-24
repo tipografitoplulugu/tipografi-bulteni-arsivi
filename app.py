@@ -108,6 +108,15 @@ st.markdown(
         gap: .75rem 1.5rem;
     }
     .footer-name { color: var(--muted); font-size: inherit; font-weight: 500; }
+    .footer-actions {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        flex-wrap: wrap;
+        gap: .75rem 1.1rem;
+    }
+    .footer-subscribe { color: var(--muted); font-size: inherit; }
+    .footer-subscribe a { color: var(--accent) !important; font-weight: 550; }
     .footer-social {
         display: flex;
         align-items: center;
@@ -335,6 +344,7 @@ st.markdown(
         .brand-header { align-items: flex-start; flex-direction: column; }
         .brand-links { margin-left: 0; white-space: normal; }
         .footer-content { align-items: flex-start; flex-direction: column; }
+        .footer-actions { justify-content: flex-start; }
         .footer-social { justify-content: flex-start; gap: .8rem; }
         .result-meta { flex-direction: column; gap: .2rem; }
         [data-testid="stHorizontalBlock"] { flex-wrap: wrap; gap: .55rem; }
@@ -960,7 +970,9 @@ st.markdown(
     <footer class="archive-footer" aria-label="Alt bilgi">
       <div class="footer-content">
         <div class="footer-name">Türkçe Tipografi Topluluğu</div>
-        <nav class="footer-social" aria-label="Sosyal medya bağlantıları">
+        <div class="footer-actions">
+          <div class="footer-subscribe">Bültene abone olmak için <a href="https://tipografi.substack.com/" target="_blank" rel="noopener noreferrer">dokun</a></div>
+          <nav class="footer-social" aria-label="Sosyal medya bağlantıları">
           <a href="https://www.facebook.com/tipografi/" target="_blank" rel="noopener noreferrer" aria-label="Facebook" title="Facebook">
             <svg viewBox="0 0 24 24" aria-hidden="true"><path class="icon-fill" d="M13.6 21v-8.2h2.8l.4-3.2h-3.2V7.5c0-.9.3-1.6 1.6-1.6H17V3.1c-.3 0-1.3-.1-2.4-.1-2.4 0-4.1 1.5-4.1 4.3v2.4H7.8v3.2h2.7V21z"/></svg>
           </a>
@@ -979,7 +991,8 @@ st.markdown(
           <a href="https://tipografi.substack.com/" target="_blank" rel="noopener noreferrer" aria-label="Substack" title="Substack">
             <svg viewBox="0 0 24 24" aria-hidden="true"><path class="icon-fill" d="M3 4h18v2H3zm0 4h18v2H3zm0 4h18v2H3zm0 4h18v5l-9-3.5L3 21z"/></svg>
           </a>
-        </nav>
+          </nav>
+        </div>
       </div>
     </footer>
     """,
