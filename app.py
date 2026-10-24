@@ -91,8 +91,27 @@ st.markdown(
         line-height: 1.72;
     }
     .hero-rule { border: 0; border-top: 1px solid var(--line); margin: 1.8rem 0 1.5rem; }
-    .stat-label { color: var(--muted); font-size: .75rem; letter-spacing: .04em; text-transform: uppercase; }
-    .stat-value { margin-top: .25rem; color: var(--ink); font: 1.45rem Georgia, serif; letter-spacing: -.03em; }
+    .stat-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        column-gap: 1.5rem;
+        row-gap: 1.1rem;
+    }
+    .stat-item { min-width: 0; }
+    .stat-label {
+        margin-bottom: .2rem;
+        color: var(--muted);
+        font-size: .75rem;
+        line-height: 1.4;
+        letter-spacing: .04em;
+        text-transform: uppercase;
+    }
+    .stat-value {
+        color: var(--ink);
+        font: 1.45rem/1.2 Georgia, serif;
+        letter-spacing: -.03em;
+        overflow-wrap: anywhere;
+    }
     .archive-footer {
         margin-top: 1.6rem;
         border-top: 1px solid var(--line);
@@ -346,6 +365,7 @@ st.markdown(
         .footer-content { align-items: flex-start; flex-direction: column; }
         .footer-actions { justify-content: flex-start; }
         .footer-social { justify-content: flex-start; gap: .8rem; }
+        .stat-grid { grid-template-columns: minmax(0, 1fr); row-gap: 1.05rem; }
         .result-meta { flex-direction: column; gap: .2rem; }
         [data-testid="stHorizontalBlock"] { flex-wrap: wrap; gap: .55rem; }
         [data-testid="stHorizontalBlock"] > [data-testid="column"] { min-width: min(100%, 180px); flex: 1 1 180px; }
@@ -762,18 +782,22 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-stat_cols = st.columns(3)
-for column, label, value in zip(
-    stat_cols,
+stat_items = []
+for label, value in zip(
     ("Yayımlanan sayı", "İndekslenen gelişme", "ARŞİV KAPSAMI"),
     (f"{total_issues:,}", f"{total_articles:,}",
      f"{min(available_years)}—{max(available_years)}" if available_years else "—"),
 ):
-    with column:
-        st.markdown(
-            f'<div class="stat-label">{label}</div><div class="stat-value">{value}</div>',
-            unsafe_allow_html=True,
-        )
+    stat_items.append(
+        '<div class="stat-item">'
+        f'<div class="stat-label">{html.escape(label)}</div>'
+        f'<div class="stat-value">{html.escape(value)}</div>'
+        '</div>'
+    )
+st.markdown(
+    '<div class="stat-grid">' + "".join(stat_items) + '</div>',
+    unsafe_allow_html=True,
+)
 
 st.markdown('<hr class="hero-rule">', unsafe_allow_html=True)
 st.markdown('<div class="section-eyebrow">ARŞİVDE ARA</div>', unsafe_allow_html=True)
