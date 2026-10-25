@@ -778,15 +778,19 @@ st.markdown(
     }
     [data-testid="stExpander"] [data-testid="stExpanderDetails"] {
         border-top: 1px solid var(--line) !important;
-        padding: .85rem 1rem 1rem !important;
+        padding: .85rem 1rem !important;
         background: var(--paper) !important;
+    }
+    [data-testid="stExpander"] [data-testid="stExpanderDetails"] div:last-child {
+        margin-bottom: 0 !important;
+        padding-bottom: 0 !important;
     }
     .citation-row {
         display: flex;
         align-items: stretch;
         gap: .75rem;
         width: 100%;
-        margin-bottom: .15rem;
+        margin: 0 !important;
     }
     .citation-box {
         flex: 1 1 auto;
