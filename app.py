@@ -357,6 +357,13 @@ st.markdown(
         -webkit-font-feature-settings: "liga" 1, "dlig" 1, "locl" 0 !important;
     }
     [data-testid="stHeadingWithActionElements"] h2 { font-size: clamp(1.6rem, 3vw, 2.2rem) !important; }
+    [data-testid="stHeadingWithActionElements"] h3,
+    [data-testid="stHeadingWithActionElements"] h3 span,
+    [data-testid="stVerticalBlockBorderWrapper"] h3,
+    [data-testid="stVerticalBlockBorderWrapper"] h3 span,
+    h3 {
+        letter-spacing: 0.015em !important;
+    }
     p, li, label, [data-testid="stMarkdownContainer"] { color: var(--ink); }
     p { line-height: 1.7; }
     a, [data-testid="stMarkdownContainer"] a { color: var(--link) !important; text-underline-offset: 3px; }
@@ -1352,10 +1359,9 @@ with st.container(key="archive_brand_row"):
 st.markdown('<hr class="hero-rule">', unsafe_allow_html=True)
 st.title("Tipografi Bülteni Arşivi")
 st.markdown(
-    '<div class="hero-copy">Türkiye’de ve dünyada tipografi alanında yaşanan'
-    ' önemli gelişmeleri bir araya getirdiğimiz, '
-    '2019’dan bu yana aylık olarak yayımlanan bültenlerde anahtar kelime ile arama yapabilir, '
-    'yeni sayılar eklendikçe büyüyen keşfe siz de katılabilirsiniz.</div>',
+    '<div class="hero-copy">2019’dan bu yana her ay yayımladığımız bültenlerde, '
+    'Türkiye’de ve dünyada tipografi alanında öne çıkan gelişmeleri bir araya getiriyoruz. '
+    'Anahtar kelimelerle arama yapabilir, yeni sayılar eklendikçe büyüyen arşivimizi keşfedebilirsiniz.</div>',
     unsafe_allow_html=True,
 )
 
