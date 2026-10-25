@@ -1353,8 +1353,8 @@ st.markdown('<hr class="hero-rule">', unsafe_allow_html=True)
 st.title("Tipografi Bülteni Arşivi")
 st.markdown(
     '<div class="hero-copy">Türkiye’de ve dünyada tipografi alanında yaşanan'
-    'önemli gelişmeleri bir araya getiriyoruz. '
-    '2019’dan bu yana aylık olarak yayımlanan bültenlerin arşivinde anahtar kelime ile arama yapabilir, '
+    ' önemli gelişmeleri bir araya getirdiğimiz, '
+    '2019’dan bu yana aylık olarak yayımlanan bültenlerde anahtar kelime ile arama yapabilir, '
     'yeni sayılar eklendikçe büyüyen keşfe siz de katılabilirsiniz.</div>',
     unsafe_allow_html=True,
 )
