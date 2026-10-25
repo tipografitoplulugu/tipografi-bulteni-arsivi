@@ -284,12 +284,28 @@ st.markdown(
         font-family: "Instrument Serif", serif !important;
         font-weight: 400 !important;
         letter-spacing: -0.02em !important;
+        font-variant-ligatures: common-ligatures contextual !important;
+        -webkit-font-variant-ligatures: common-ligatures contextual !important;
+        font-feature-settings: "liga" 1, "dlig" 1, "locl" 0 !important;
+        -webkit-font-feature-settings: "liga" 1, "dlig" 1, "locl" 0 !important;
     }
     [data-testid="stHeadingWithActionElements"] h1 {
         font-size: clamp(2.8rem, 6vw, 5.25rem) !important;
         line-height: 1.02 !important;
         font-weight: 400 !important;
         margin: .4rem 0 .8rem !important;
+        letter-spacing: normal !important;
+        font-variant-ligatures: common-ligatures contextual !important;
+        -webkit-font-variant-ligatures: common-ligatures contextual !important;
+        font-feature-settings: "liga" 1, "dlig" 1, "locl" 0 !important;
+        -webkit-font-feature-settings: "liga" 1, "dlig" 1, "locl" 0 !important;
+    }
+    [data-testid="stHeadingWithActionElements"] h1 span {
+        letter-spacing: normal !important;
+        font-variant-ligatures: common-ligatures contextual !important;
+        -webkit-font-variant-ligatures: common-ligatures contextual !important;
+        font-feature-settings: "liga" 1, "dlig" 1, "locl" 0 !important;
+        -webkit-font-feature-settings: "liga" 1, "dlig" 1, "locl" 0 !important;
     }
     [data-testid="stHeadingWithActionElements"] h2 { font-size: clamp(1.6rem, 3vw, 2.2rem) !important; }
     p, li, label, [data-testid="stMarkdownContainer"] { color: var(--ink); }
@@ -473,9 +489,13 @@ st.markdown(
         appearance: none !important;
     }
     [data-testid="stTextInput"] input::placeholder,
-    [data-testid="stTextInputRootElement"] input::placeholder {
+    [data-testid="stTextInputRootElement"] input::placeholder,
+    [data-testid="stTextInput"] input::-webkit-input-placeholder,
+    [data-testid="stTextInputRootElement"] input::-webkit-input-placeholder,
+    [data-testid="stTextInput"] input::-moz-placeholder,
+    [data-testid="stTextInputRootElement"] input::-moz-placeholder {
         color: var(--placeholder) !important;
-        opacity: 1 !important;
+        opacity: .55 !important;
     }
     /* Streamlit wraps text inputs in a theme-colored root that is separate
        from the input itself. Keep that wrapper the same size and surface. */
@@ -1264,7 +1284,7 @@ with st.form("archive_search"):
         st.markdown('<div class="section-eyebrow">ARŞİVDE ARA</div>', unsafe_allow_html=True)
         st.text_input(
             "Aranacak ifade", key="archive_query",
-            placeholder="Örn. değişken yazıtipi, Monotype, kaligrafi",
+            placeholder="Örneğin değişken yazıtipi, Monotype, kaligrafi",
             label_visibility="collapsed",
         )
     with year_col:
