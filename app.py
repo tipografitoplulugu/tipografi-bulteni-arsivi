@@ -243,6 +243,55 @@ THEME_BOOTSTRAP = f"""
   parentWindow.__archiveThemeCurrent = serverTheme;
   syncToggle();
   bindSearchTriggers();
+  if (!parentWindow.__citationCopyBound) {{
+    parentWindow.__citationCopyBound = true;
+    parentWindow.document.addEventListener("click", async (e) => {{
+      const btn = e.target.closest(".citation-copy-btn");
+      if (!btn) return;
+      e.preventDefault();
+      e.stopPropagation();
+      if (btn.dataset.copying === "true") return;
+      btn.dataset.copying = "true";
+      const text = btn.getAttribute("data-copy") || "";
+      if (!text) return;
+      const fallback = (val) => {{
+        const ta = parentWindow.document.createElement("textarea");
+        ta.value = val;
+        ta.setAttribute("readonly", "");
+        ta.style.position = "fixed";
+        ta.style.opacity = "0";
+        parentWindow.document.body.appendChild(ta);
+        ta.select();
+        let ok = false;
+        try {{ ok = parentWindow.document.execCommand("copy"); }} catch (err) {{}}
+        ta.remove();
+        return ok;
+      }};
+      try {{
+        if (parentWindow.navigator.clipboard && parentWindow.isSecureContext) {{
+          try {{
+            await parentWindow.navigator.clipboard.writeText(text);
+          }} catch (err) {{
+            if (!fallback(text)) throw err;
+          }}
+        }} else if (!fallback(text)) {{
+          throw new Error("Clipboard unavailable");
+        }}
+        btn.textContent = "Kopyalandı";
+        btn.classList.add("copied");
+        btn.setAttribute("aria-label", "Alıntı kopyalandı");
+        setTimeout(() => {{
+          btn.textContent = "Kopyala";
+          btn.classList.remove("copied");
+          btn.setAttribute("aria-label", "Alıntıyı panoya kopyala");
+          delete btn.dataset.copying;
+        }}, 2000);
+      }} catch (err) {{
+        console.error("Kopyalama başarısız:", err);
+        delete btn.dataset.copying;
+      }}
+    }});
+  }}
   if (!parentWindow.__archiveThemeObserver) {{
     parentWindow.__archiveThemeObserver = new MutationObserver(handleObserver);
     parentWindow.__archiveThemeObserver.observe(parentWindow.document.body, {{ childList: true, subtree: true }});
@@ -728,11 +777,20 @@ st.markdown(
         color: var(--ink) !important;
     }
     [data-testid="stExpander"] [data-testid="stExpanderDetails"] {
-        border-top: 1px solid var(--line);
-        padding: .8rem 1rem .9rem;
+        border-top: 1px solid var(--line) !important;
+        padding: .85rem 1rem 1rem !important;
         background: var(--paper) !important;
     }
+    .citation-row {
+        display: flex;
+        align-items: stretch;
+        gap: .75rem;
+        width: 100%;
+        margin-bottom: .15rem;
+    }
     .citation-box {
+        flex: 1 1 auto;
+        min-width: 0;
         border: 1px solid var(--line) !important;
         border-radius: 10px !important;
         background: var(--surface-subtle) !important;
@@ -742,6 +800,44 @@ st.markdown(
         line-height: 1.65;
         overflow-wrap: anywhere;
         word-break: normal;
+        box-sizing: border-box;
+    }
+    .citation-copy-btn {
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        flex: 0 0 96px !important;
+        width: 96px !important;
+        min-width: 96px !important;
+        padding: 0 .8rem !important;
+        border: 1px solid var(--accent) !important;
+        border-radius: 10px !important;
+        background: var(--accent) !important;
+        color: var(--on-accent) !important;
+        font-family: "DM Mono", monospace !important;
+        font-size: .86rem !important;
+        font-weight: 500 !important;
+        appearance: none !important;
+        -webkit-appearance: none !important;
+        box-shadow: none !important;
+        cursor: pointer;
+        transition: background-color 120ms ease, border-color 120ms ease;
+        box-sizing: border-box !important;
+        user-select: none;
+        white-space: nowrap;
+    }
+    .citation-copy-btn:hover {
+        background: var(--accent-hover) !important;
+        border-color: var(--accent-hover) !important;
+    }
+    .citation-copy-btn:focus-visible {
+        outline: 2px solid var(--focus) !important;
+        outline-offset: 2px !important;
+    }
+    .citation-copy-btn.copied {
+        background: var(--success-bg) !important;
+        border-color: var(--success-border) !important;
+        color: var(--success) !important;
     }
     .app-status {
         border: 1px solid var(--line);
@@ -800,6 +896,8 @@ st.markdown(
         .footer-social { justify-content: flex-start; gap: .8rem; }
         .stat-grid { grid-template-columns: minmax(0, 1fr); row-gap: 1.05rem; }
         .result-meta { flex-direction: column; gap: .2rem; }
+        .citation-row { gap: .5rem; }
+        .citation-copy-btn { flex: 0 0 84px !important; width: 84px !important; min-width: 84px !important; padding: 0 .5rem !important; font-size: .82rem !important; }
         [data-testid="stHorizontalBlock"] { flex-wrap: wrap; gap: .55rem; }
         [data-testid="stHorizontalBlock"] > [data-testid="column"] { min-width: min(100%, 180px); flex: 1 1 180px; }
     }
@@ -1435,18 +1533,16 @@ if query:
                     f"{row['ay'] or ''}). {title}. Tipografi Bülteni. {issue_url}"
                 )
                 with st.expander("Alıntı yap", expanded=False):
-                    citation_col, copy_col = st.columns(
-                        [8, 1.15], vertical_alignment="center"
+                    citation_safe = html.escape(citation)
+                    citation_attr = html.escape(citation, quote=True)
+                    st.markdown(
+                        f'<div class="citation-row">'
+                        f'<div class="citation-box">{citation_safe}</div>'
+                        f'<button type="button" class="citation-copy-btn" data-copy="{citation_attr}" '
+                        f'aria-label="Alıntıyı panoya kopyala">Kopyala</button>'
+                        f'</div>',
+                        unsafe_allow_html=True,
                     )
-                    with citation_col:
-                        st.markdown(
-                            f'<div class="citation-box">{html.escape(citation)}</div>',
-                            unsafe_allow_html=True,
-                        )
-                    with copy_col:
-                        components.html(
-                            copy_button_markup(citation, CURRENT_THEME), height=52, scrolling=False
-                        )
 
         if page_count > 1:
             st.markdown("")
